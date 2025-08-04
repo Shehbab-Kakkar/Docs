@@ -1,4 +1,3 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" class="logo" width="120"/>
 
 # This is not readme.md format it is showing me in the text only. I want o add in the github and command part in the coding format in the github readme.
 
