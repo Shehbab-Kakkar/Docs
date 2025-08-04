@@ -52,7 +52,7 @@ You can enable the Skip OS Shutdown feature via the AWS CLI or EC2 Console (when
 
 **AWS CLI example:**
 
-aws ec2 stop-instances --instance-id i-1234567890abcdef0 --skip-os-shutdown
+<code>aws ec2 stop-instances --instance-id i-1234567890abcdef0 --skip-os-shutdown </code>
 
 
 ---
