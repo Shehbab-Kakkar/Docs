@@ -1,7 +1,4 @@
 
-# This is not readme.md format it is showing me in the text only. I want o add in the github and command part in the coding format in the github readme.
-
-Absolutely! Below is the README.md with **proper Markdown formatting** for GitHub, where all AWS CLI commands are in code blocks (fenced with triple backticks and labeled with `bash` for syntax highlighting). Headings, sections, and notes are formatted for clear GitHub presentation.
 
 # On-Prem to AWS Migration: CLI Guide
 
