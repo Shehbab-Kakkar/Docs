@@ -19,7 +19,7 @@ This document provides information on the Software Defined Networking (SDN) used
 OpenShift relies on a Software Defined Networking (SDN) layer to provide secure, scalable, and high-performance networking for Kubernetes workloads. In earlier versions, the default SDN was **OpenShift SDN**. However, with the evolution of the platform, Red Hat now recommends a new SDN for modern OpenShift clusters.
 
 
-OVN stands for Open Virtual Network. It is an open source network virtualization project that provides network automation and advanced networking features for virtualized environments, and it is now the foundation of the default SDN (Software Defined Networking) solution in modern OpenShift versions.
+<p>OVN stands for Open Virtual Network. It is an open source network virtualization project that provides network automation and advanced networking features for virtualized environments, and it is now the foundation of the default SDN (Software Defined Networking) solution in modern OpenShift versions.</p>
 ---
 
 ## Default SDN in Latest OpenShift Versions
