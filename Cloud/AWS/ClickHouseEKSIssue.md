@@ -1,22 +1,73 @@
-This issue is a real-world example of hidden infrastructure bottlenecks that can affect cloud-native applications, specifically when running distributed databases like ClickHouse on Kubernetes clusters in AWS.
-What Happened?
-The user experienced repeated crashes of ClickHouse pods and sometimes the entire nodes, despite there being no signs of problems in query workload, logs, compute, or memory.
-Scaling up the node group (adding more EC2 instances) didn't help—new nodes filled up and crashed just as quickly.
-The initial suspicion was that some resource limit (CPU, RAM, disk, etc.) was the cause. However, there was a subtler infrastructure limit at play.
-Root Causes and Fixes:
-Pod IP Address Exhaustion:
-In AWS EKS, the number of pods that each node can run is capped by the number of available IP addresses per Elastic Network Interface (ENI).
-For certain EC2 instance types, like t3.medium, the default was only 17 pod IPs per node.
-Once that limit was reached, new pods couldn’t be scheduled, manifesting as instability and crashes.
-Fix 1: Enabling prefix delegation in the AWS VPC CNI plugin increased the pod IP quota per node, solving the immediate IP exhaustion.
-ENI Throughput Saturation:
-Despite resolving the IP limit, pods continued to crash.
-Investigation with Pixie (an observability tool) revealed network saturation: the ENI’s throughput (measured in bandwidth and packets per second) was being maxed out.
-The t3.medium instance type has limited network and ENI capacity, insufficient for the high volume of traffic between distributed ClickHouse nodes.
-Fix 2: Switching to larger EC2 instances with better network and ENI performance allowed pods to stabilize, scale, and communicate without exceeding underlying networking limits.
-Key Lessons:
-Cloud-Native Scaling Limits: Kubernetes and cloud services introduce new types of scaling pain points, like pod IP allocation and network throughput, which often aren’t obvious through traditional DB/server monitoring.
-Horizontal and Vertical Scaling: Scaling isn’t just about adding more nodes (horizontal)—sometimes you need “vertical scaling” (upgrading node specs) or changes in network config.
-Observability is Critical: Tools like Pixie help reveal problems that common monitoring and logs miss, highlighting the need for deep observability in modern systems.
-Resilience Engineering: True reliability work goes “beneath the stack,” into the details of cloud networking, kernel limits, and platform integration.
-Takeaway: Even when your application code, configurations, and query patterns are flawless, infrastructure limitations—especially in networking—can cause unexplained failures. Understanding and tuning these “hidden” layers is essential for resilient, scalable cloud architectures.
+# Debugging Distributed Databases: Beyond the Stack
+
+## 🐞 The Problem
+
+While running **ClickHouse** on a Kubernetes cluster in AWS, everything kept failing. But it wasn’t the database.
+
+- **No query spikes.**
+- **No errors in logs.**
+- **Just pods endlessly crashing, sometimes taking down whole nodes.**
+
+### Attempts to Fix
+
+- **Scaled the node group**: Added more nodes.
+- **Result:** The more nodes I added, the faster they filled. The pod crashes continued.
+- **Checked compute and memory:** No shortages.
+- **Checked storage:** Healthy.
+- **Checked distribution:** Pods and services were balanced.
+
+> **It didn’t look like a resource problem. But it was. Just not the one I expected.**
+
+---
+
+## 🔍 Root Cause Analysis
+
+### **1. Pod IP Exhaustion**
+
+- **Kubernetes on AWS*** assigns pod IPs based on each node’s Elastic Network Interface (ENI) capacity.
+- On `t3.medium`, only **17 pods** could get IPs per node by default.
+- When the IP limit was reached, further pods wouldn't schedule, leading to instability.
+
+#### **Resolution #1: Expanded Pod IP Allocation—Prefix Delegation**
+- **Action:** Enabled _prefix delegation_ in the AWS VPC CNI.
+- **Effect:** Increased the per-node IP allocation from **17 to 117**, unblocking pod scheduling.
+- **But —** crashes kept coming.
+
+---
+
+### **2. ENI Throughput Saturation**
+
+- Used [**Pixie**](https://pixielabs.ai/) (an observability tool): revealed no stable pods, no traces, and lots of static.
+- **Root Cause:** The t3.medium’s ENI reached max bandwidth and packets-per-second (PPS).
+- **Pods failed** not because of database errors, but due to saturated network limits at the instance and ENI level.
+
+#### **Resolution #2: Upgrade Instance Type**
+- **Action:** Switched to larger EC2 instance types **(with higher network and ENI throughput)**.
+- **Result:** Pods stabilized, ClickHouse scaled, Pixie monitoring revived.
+
+---
+
+## ⚡️ Key Takeaways
+
+- **Scaling isn’t just horizontal** (adding more nodes). Sometimes, it’s vertical (beefier nodes) and _deeper_ (network, kernel, CNI settings).
+- **Pod scheduling limits** can be non-obvious: not all resource issues announce themselves via CPU/RAM metrics.
+- **Cloud-native environments introduce new limits** (e.g., ENI throughput, pod IP addresses).
+- **Tools like Pixie reveal what logs can’t:** bottlenecks beneath your application stack.
+
+> **We spend years tuning queries and configs, but real resilience starts when you debug beneath the stack.  
+> Scaling doesn’t just mean wider — it’s also about the cloud plumbing below.**
+
+---
+
+### 📊 Example: Healthy Cluster (Pixie Flamegraph Visualization)
+
+![Pixie Flamegraph Example](example-pixie-flamegraph.png)
+
+---
+
+## References
+
+- [AWS VPC CNI Prefix Delegation Documentation](https://docs.aws.amazon.com/eks/latest/userguide/pod-networking.html)
+- [AWS EC2 Instance Network Performance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html#instance-type-networking)
+
+*For issues, contributions, or more stories from production: open an Issue or PR!*
