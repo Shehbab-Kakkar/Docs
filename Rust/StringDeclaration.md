@@ -50,3 +50,46 @@ let message = "Hello, world!".to_string();
 **Tip:**  
 - Use `&str` for string literals and when borrowing is sufficient.
 - Use `String` when you need an owned, mutable, or growable string.
+
+---
+
+## How to Print String Values in Rust
+
+To print variables (including string types) in Rust, use the `println!` macro.
+
+---
+
+### Printing a String Slice (`&str`)
+
+```rust
+let greeting = "Hello, world!";
+println!("{}", greeting); // Output: Hello, world!
+```
+
+---
+
+### Printing an Owned String (`String`)
+
+```rust
+let message = String::from("Hello, Rust!");
+println!("{}", message); // Output: Hello, Rust!
+```
+
+---
+
+### Printing Multiple Values
+
+You can print multiple variables by using `{}` placeholders in the string:
+
+```rust
+let name = "Alice";
+let language = String::from("Rust");
+println!("{} loves {} programming!", name, language);
+// Output: Alice loves Rust programming!
+```
+
+---
+
+**Tip:**  
+- Use `{}` as a placeholder for variables inside the `println!` string.
+- List variables after the comma in the order they should be printed.
