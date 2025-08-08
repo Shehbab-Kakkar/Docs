@@ -1,0 +1,28 @@
+AWS has 200+ services, but you can get 90% of real work done by mastering these 10. Learn these first and get productive fast:
+• S3 – object storage
+• DynamoDB – fast, scalable NoSQL
+• Lambda – serverless compute
+• Cognito – auth & user management
+• API Gateway – manage HTTP/WebSocket APIs
+• EventBridge – route domain events
+• SQS – queue work for async processing
+• SNS – push notifications & fan-out
+• IAM – identities, roles, permissions
+• CloudFormation – infrastructure as code (feel free to substitute this with CDK, Pulumi, SST, Serverless Framework, Terraform, etc.)
+
+With just these 10 services, you can build:
+
+• REST APIs: API Gateway + Lambda + DynamoDB, secured by Cognito (JWT authorizer).
+• Event-driven architectures: Producers publish events to EventBridge; Lambda consumers process them. Add SQS queues to buffer spikes & capture failed messages. Optionally add SNS to fan-out to other services or email.
+• File upload & processing: Use presigned S3 URLs to securely upload files to S3. Then use S3 notifications to process uploads with Lambda.
+• Background/Cron jobs: Use EventBridge Scheduler to run nightly reports, cleanup jobs, etc. with Lambda.
+• Real-time notifications (WebSockets): API Gateway WebSocket API + Lambda + DynamoDB (to store connections).
+• Auth & user flows: Use Cognito Hosted UI to manage user flows and use Cognito User Pools & API Gateway to protect your API.
+• Multi-tenant SaaS: Use Cognito groups to model multi-tenancy.
+• Webhook & fan-out: API Gateway receives webhook events → Lambda validates them → enqueue to SQS → downstream Lambdas update DynamoDB or fan-out via SNS.
+
+These are just a few examples of what you can do!
+
+If you feel overwhelmed as a beginner, focus on these and they can take you pretty far already.
+
+ps. EC2, VPC, and ECS are intentionally missing. You don’t need them to be productive early on. Start with higher-level services that give you more leverage so you can do more with less.
