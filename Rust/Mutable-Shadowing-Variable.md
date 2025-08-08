@@ -67,3 +67,9 @@ In Rust, after shadowing, you cannot access the old value of the variable by its
 
 No, in Rust, shadowing does not change the value at the original variable’s memory address. Instead, it creates a new variable binding—possibly even at a different memory address—effectively hiding the previous variable with the same name.
 
+Stack-allocated values (e.g., integers, most small types):
+The old value remains in memory until the end of its scope. Shadowing does not immediately free or overwrite the memory; the old variable is simply inaccessible by name from that point forward. Rust will drop (clean up) the old value at the end of its scope as usual.
+
+Heap-allocated values (e.g., String, Vec):
+Shadowing a heap-allocated variable (like a String) works the same way. The memory is not immediately freed on shadowing. The value will be dropped (and its memory freed) when it goes out of scope.
+
