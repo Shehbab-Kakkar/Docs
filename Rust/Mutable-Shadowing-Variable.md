@@ -59,3 +59,11 @@ let count = "hello"; // OK, type changes from i32 to &str
 > **In short:**  
 > - Use `mut` to change the value of a variable (but not its type).  
 > - Use shadowing (`let`) to create a new variable with the same name, possibly with a different type or value.
+
+
+In Rust, **after shadowing, you cannot access
+In Rust, after shadowing, you cannot access the old value of the variable by its original name—the new binding completely hides the previous one in that scope. The only way to access the old value after shadowing is to give it a new name before shadowing occurs.
+
+
+No, in Rust, shadowing does not change the value at the original variable’s memory address. Instead, it creates a new variable binding—possibly even at a different memory address—effectively hiding the previous variable with the same name.
+
