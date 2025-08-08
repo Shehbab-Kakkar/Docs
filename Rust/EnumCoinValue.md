@@ -200,4 +200,19 @@ match self {
 
 
 
+## What is the Return Type of `value_in_cents` and What Does `-> u8` Mean?
 
+In Rust, the part after the `->` in a function signature specifies the function's **return type**.
+
+**Example:**
+```rust
+fn value_in_cents(&self) -> u8
+```
+
+- `-> u8` means that this function returns a value of type `u8`.
+- `u8` is an **unsigned 8-bit integer** type in Rust. It can store values from 0 to 255.
+
+So, `value_in_cents` will always return a number in the `u8` range (for example, 1, 5, 10, or 25 for different coins).
+
+**Summary:**  
+`-> u8` tells you the function will return an unsigned 8-bit integer.
