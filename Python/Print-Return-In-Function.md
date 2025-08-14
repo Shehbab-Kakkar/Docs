@@ -136,5 +136,4 @@ Because `add()` does not return anything (so returns `None`), and `print(result)
 
 ---
 
-<iframe src="https://trinket.io/embed/python3/01781cccb6c9" width="100%" height="356" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen></iframe>
 
