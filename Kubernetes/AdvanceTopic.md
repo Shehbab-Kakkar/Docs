@@ -13,3 +13,5 @@ Karpenter to right-size EC2 instances and consolidate nodes.
 ➟ They used KEDA for custom metric-based scaling, allowing HPA and VPA to work together.
 
 ➟ They applied Kyverno policies to manage PDBs, allowing underutilized nodes to be removed.
+
+Thanos For High Availabity Promethus
