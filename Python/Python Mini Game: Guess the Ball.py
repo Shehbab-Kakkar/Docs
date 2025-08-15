@@ -32,3 +32,9 @@ guess = player_guess()
 # Check if the guess is correct
 check_guess(mixedup_list, guess)
 
+"""
+Pick a number: 0, 1, or 2:  12
+Pick a number: 0, 1, or 2:  1
+Correct! You found the ball!
+Shuffled List: ['', '0', '']
+"""
