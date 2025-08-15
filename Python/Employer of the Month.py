@@ -13,3 +13,12 @@ def get_employee_of_month(employee):
       
       return (empOfMonth,WorkingHours)        
 print(get_employee_of_month(employee))       
+name,prize = get_employee_of_month(employee)
+print(name)
+print(prize)
+
+"""
+('Ram', 200)
+Ram
+200
+"""
