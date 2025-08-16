@@ -1,12 +1,18 @@
 fully enhanced GitHub Actions workflow with:
 
 ✅ Matrix per language
+
 ✅ Custom directories and ports
+
 ✅ Health checks on service endpoints
+
 ✅ Cypress matrix to test against each backend (Django, Go, Rust, Java)
+
 ✅ Support for environment variable injection (BACKEND_API_URL) into Cypress
 
+
 ✅ Final Workflow File: .github/workflows/cypress-matrix-full.yml
+
 name: Polyglot CI with Cypress (Full Matrix)
 
 on:
