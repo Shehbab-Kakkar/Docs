@@ -42,3 +42,5 @@ Presence of both is required for the email to be considered valid by this utilit
 
 > **Note:**
 > This is a **basic validation technique** and does not ensure the email address is fully valid (e.g., it doesn’t check for format errors like multiple `@` signs, misplaced dots, etc.). For more robust validation, consider using regular expressions or dedicated validation libraries.
+>
+> 
