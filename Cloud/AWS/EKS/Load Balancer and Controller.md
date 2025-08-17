@@ -42,8 +42,11 @@ More control over settings like IP mode (IP vs Instance), target type, TLS, etc.
 
 ✅ Summary Table
 Load Balancer Type	Controller Used	Resource Managed	Notes
+
 ALB	AWS Load Balancer Controller	Ingress / Service	Fully supported
+
 NLB	AWS Cloud Controller Manager (default) OR AWS Load Balancer Controller	Service type LoadBalancer	Choose based on desired flexibility
+
 🛠️ Annotations to Know (for AWS Load Balancer Controller)
 
 For ALB:
