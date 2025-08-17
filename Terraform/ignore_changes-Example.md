@@ -190,3 +190,41 @@ lifecycle {
 
 **Tip:**  
 This pattern is widely used in production EKS environments to balance infrastructure-as-code with dynamic Kubernetes scaling!
+
+---
+🔧 What is update_config in EKS Node Group?
+
+The update_config block controls how AWS EKS updates the node group when a change is made — such as changing instance types, scaling parameters, or AMI versions.
+
+Here’s your usage:
+
+update_config {
+  max_unavailable = 1
+}
+
+⚙️ What does max_unavailable = 1 mean?
+
+This setting tells AWS:
+
+“During an update to the node group, take down at most 1 node at a time.”
+
+This is part of rolling updates — where EKS:
+
+Terminates an old EC2 node (based on the old config)
+
+Brings up a new one (with the updated config)
+
+Waits for it to be healthy before moving on to the next
+
+By limiting max_unavailable to 1, you:
+
+Ensure high availability (only 1 node is offline during update)
+
+Avoid overwhelming the cluster with too many changes at once
+
+📘 Full update_config options (as of AWS/Terraform)
+Attribute	Description
+max_unavailable	(Optional) Number of nodes that can be unavailable during an update.
+max_unavailable_percentage	(Optional) Percentage of nodes that can be unavailable during an update (alternative to above).
+
+You can only use one: max_unavailable or max_unavailable_percentage.
