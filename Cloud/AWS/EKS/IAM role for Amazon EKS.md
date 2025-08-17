@@ -1,35 +1,26 @@
-Creating an IAM role for Amazon EKS (Elastic Kubernetes Service) depends on what the role will be used for. There are a few common use cases:
+# 🛡️ Creating IAM Roles for Amazon EKS (Elastic Kubernetes Service)
 
-🧰 Common EKS IAM Role Types
+This guide explains the **three core types of IAM roles for EKS** and provides example trust policies and recommended AWS-managed policies for each use case.
 
-EKS Cluster Role — for the control plane (needed when creating a cluster)
+---
 
-Node Instance Role — for EC2 worker nodes (or Fargate)
+## 🧰 Common EKS IAM Role Types
 
-IAM Roles for Service Accounts (IRSA) — fine-grained pod-level permissions
+| Role Type                                      | Purpose                                         |
+|------------------------------------------------|-------------------------------------------------|
+| EKS Cluster Role                               | Control plane: create/manage EKS cluster        |
+| Node Instance Role                             | EC2 worker nodes (or Fargate)                   |
+| IAM Roles for Service Accounts (IRSA)          | Pod-level, fine-grained permissions             |
 
-🎯 You mentioned: "IAM Role for EKS I want to create"
+---
 
-So let's clarify.
+## 📌 1. EKS Cluster Role (Control Plane)
 
-What do you need the role for?
-Choose one:
+**Purpose:**  
+Allows the EKS service to create and manage cluster resources.
 
-✅ To create and manage an EKS Cluster
-
-✅ To be used by EKS worker nodes (EC2 instances)
-
-✅ To assign IAM permissions to Kubernetes pods (IRSA)
-
-✅ Something else (e.g., CI/CD access to EKS)
-
-If you're not sure, here's a basic example for each below.
-
-📌 1. EKS Cluster Role (Used by EKS Control Plane)
-
-This role is assumed by the EKS service to create and manage the cluster resources.
-
-Trust Policy
+**Trust Policy:**
+```json
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -42,17 +33,29 @@ Trust Policy
     }
   ]
 }
+```
 
-Recommended IAM Policy to Attach
+**Recommended IAM Policy to Attach:**
+- `AmazonEKSClusterPolicy` (AWS managed)
 
-Use the AWS-managed policy:
-AmazonEKSClusterPolicy
+**How to create:**
+```bash
+aws iam create-role --role-name EKSClusterRole \
+  --assume-role-policy-document file://cluster-trust.json
 
-📌 2. EKS Node Instance Role (Used by EC2 Worker Nodes)
+aws iam attach-role-policy --role-name EKSClusterRole \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+```
 
-This role is assumed by EC2 instances running as EKS nodes.
+---
 
-Trust Policy
+## 📌 2. EKS Node Instance Role (EC2 Worker Nodes)
+
+**Purpose:**  
+Allows EC2 instances to join the EKS cluster and interact with AWS services.
+
+**Trust Policy:**
+```json
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -65,23 +68,39 @@ Trust Policy
     }
   ]
 }
+```
 
-Recommended IAM Policies to Attach
+**Recommended IAM Policies to Attach:**
+- `AmazonEKSWorkerNodePolicy`
+- `AmazonEC2ContainerRegistryReadOnly`
+- `AmazonEKS_CNI_Policy`
 
-AmazonEKSWorkerNodePolicy
+**How to create:**
+```bash
+aws iam create-role --role-name EKSNodeInstanceRole \
+  --assume-role-policy-document file://node-trust.json
 
-AmazonEC2ContainerRegistryReadOnly
+aws iam attach-role-policy --role-name EKSNodeInstanceRole \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
 
-AmazonEKS_CNI_Policy (for networking)
+aws iam attach-role-policy --role-name EKSNodeInstanceRole \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
 
-📌 3. IAM Role for Service Account (IRSA)
+aws iam attach-role-policy --role-name EKSNodeInstanceRole \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+```
 
-Used to assign IAM permissions to Kubernetes pods.
+---
 
-Create an IAM Role with trust relationship to OIDC provider of your EKS cluster.
+## 📌 3. IAM Role for Service Account (IRSA)
 
-Example Trust Policy:
+**Purpose:**  
+Assigns IAM permissions to Kubernetes pods via service accounts (fine-grained, pod-level access).
 
+**Trust Policy Example:**  
+Replace `<ACCOUNT_ID>`, `<OIDC_PROVIDER_URL>`, `<namespace>`, `<serviceaccount-name>` as appropriate.
+
+```json
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -99,6 +118,38 @@ Example Trust Policy:
     }
   ]
 }
+```
 
+**Attach:**  
+- Only the fine-grained IAM policy your pods need (e.g., S3 access).
 
-Attach fine-grained policy for your pod’s needs.
+**How to create:**
+```bash
+aws iam create-role --role-name MyServiceAccountRole \
+  --assume-role-policy-document file://irsa-trust.json
+
+aws iam attach-role-policy --role-name MyServiceAccountRole \
+  --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+```
+
+---
+
+## 📝 Which One Do You Need?
+
+- To create/manage EKS clusters: **EKS Cluster Role**
+- For EC2 worker nodes: **Node Instance Role**
+- For fine-grained pod permissions: **IRSA**
+- For CI/CD or other use cases: tailor the trust and managed policies accordingly
+
+---
+
+## 📚 References
+
+- [EKS IAM Documentation](https://docs.aws.amazon.com/eks/latest/userguide/security-iam.html)
+- [IAM Roles for Service Accounts (IRSA)](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)
+- [EKS Best Practices](https://aws.github.io/aws-eks-best-practices/security/docs/iam/)
+
+---
+
+**Tip:**  
+Always follow the principle of least privilege when attaching policies to your IAM roles.
