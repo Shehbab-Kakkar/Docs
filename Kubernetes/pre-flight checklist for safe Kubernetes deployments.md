@@ -1,27 +1,4 @@
-
-# 1) 𝗸𝘂𝗯𝗲𝗰𝘁𝗹 𝗱𝗶𝗳𝗳 -𝗳 𝗺𝗮𝗻𝗶𝗳𝗲𝘀𝘁.𝘆𝗮𝗺𝗹 → see exactly what will change
-
-2) 𝗸𝘂𝗯𝗲𝗰𝘁𝗹 𝗴𝗲𝘁 𝗮𝗹𝗹 -𝗻 <𝗻𝗮𝗺𝗲𝘀𝗽𝗮𝗰𝗲> → snapshot of the current state
-3) 𝗸𝘂𝗯𝗲𝗰𝘁𝗹 𝗴𝗲𝘁 𝗲𝘃𝗲𝗻𝘁𝘀 -𝗻 <𝗻𝗮𝗺𝗲𝘀𝗽𝗮𝗰𝗲> --𝘀𝗼𝗿𝘁-𝗯𝘆=.𝗺𝗲𝘁𝗮𝗱𝗮𝘁𝗮.𝗰𝗿𝗲𝗮𝘁𝗶𝗼𝗻𝗧𝗶𝗺𝗲𝘀𝘁𝗮𝗺𝗽 → verify container images exist to avoid ImagePull errors
-4) 𝗸𝘂𝗯𝗲𝗰𝘁𝗹 𝗮𝗽𝗽𝗹𝘆 -𝗳 𝗺𝗮𝗻𝗶𝗳𝗲𝘀𝘁.𝘆𝗮𝗺𝗹 --𝗱𝗿𝘆-𝗿𝘂𝗻=𝘀𝗲𝗿𝘃𝗲𝗿 → validate against the API without touching live resources
-5) 𝗸𝘂𝗯𝗲𝗰𝘁𝗹 𝗮𝗽𝗽𝗹𝘆 --𝘃𝗮𝗹𝗶𝗱𝗮𝘁𝗲 -𝗳 𝗺𝗮𝗻𝗶𝗳𝗲𝘀𝘁.𝘆𝗮𝗺𝗹 → catch YAML schema mistakes early
-6) 𝗸𝘂𝗯𝗲𝗰𝘁𝗹 𝗱𝗲𝘀𝗰𝗿𝗶𝗯𝗲 𝗰𝗼𝗻𝗳𝗶𝗴𝗺𝗮𝗽 <𝗻𝗮𝗺𝗲> -𝗻 <𝗻𝗮𝗺𝗲𝘀𝗽𝗮𝗰𝗲> → ensure required config values exist
-7) 𝗸𝘂𝗯𝗲𝗰𝘁𝗹 𝗴𝗲𝘁 𝘀𝗲𝗰𝗿𝗲𝘁 <𝗻𝗮𝗺𝗲> -𝗻 <𝗻𝗮𝗺𝗲𝘀𝗽𝗮𝗰𝗲> → ensure secrets are present
-8) 𝗸𝘂𝗯𝗲𝗰𝘁𝗹 𝗱𝗲𝘀𝗰𝗿𝗶𝗯𝗲 𝗾𝘂𝗼𝘁𝗮 -𝗻 <𝗻𝗮𝗺𝗲𝘀𝗽𝗮𝗰𝗲> → check resource limits won’t block apply
-
-At first, I thought this was overkill. Wouldn’t it slow deployments down?
-
-But when I started using it, the results spoke for themselves:
-
-- No more blind applies
-- Confidence in every rollout
-- Faster recovery from issues
-- Safer deployments in production
-
-Explain in detail.
-
-Great question 👍 — what you’ve outlined is essentially a **pre-flight checklist for safe Kubernetes deployments**. At first glance, it can feel like extra work ("slowing things down"), but in reality each of these commands plays a key *risk-mitigation* role. Let’s go through them step by step, and then I’ll explain why this approach speeds you up in the long run rather than slows you down.
-
+ **pre-flight checklist for safe Kubernetes deployments**. 
 ***
 
 ## 🔎 Step-by-step breakdown
