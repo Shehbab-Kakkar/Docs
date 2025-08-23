@@ -138,3 +138,102 @@ Ram's marks: 32
 This program demonstrates how to efficiently manipulate a `HashMap` in Rust using methods like `get()`, `entry()`, `or_insert()`, and `and_modify()`. These methods provide robust handling of key-value pairs, whether you’re accessing, modifying, or inserting data.
 
 ---
+Let's go step-by-step to understand how the value for `"Sita"` is updated using the line:
+
+```rust
+marks.entry("Sita").and_modify(|mark| *mark += 5);
+```
+
+### What does this line do?
+
+1. **`marks.entry("Sita")`**:
+
+   * The `entry()` method provides access to the entry for a particular key in the `HashMap`.
+   * `entry("Sita")` checks if the key `"Sita"` exists in the `HashMap` and returns an `Entry` object, which can be used to either:
+
+     * **Modify** the existing value if the key exists, or
+     * **Insert** a new key-value pair if the key doesn’t exist.
+   * `Entry` is an enum that can have two variants:
+
+     * `Occupied(OccupiedEntry)`: The key exists in the map.
+     * `Vacant(VacantEntry)`: The key does not exist in the map.
+
+2. **`and_modify(|mark| *mark += 5)`**:
+
+   * This is a method chained to `entry()`. It's called **only if the key exists** in the `HashMap` (i.e., it's an `Occupied` entry).
+   * The `and_modify()` method takes a closure that is executed on the value associated with the existing key.
+   * `mark` is a **mutable reference** to the value associated with the key `"Sita"`. The closure body `*mark += 5` dereferences the `mark` reference and adds `5` to it.
+
+     * `*mark` means we access the value `mark` refers to and modify it.
+     * `mark += 5` increments the value by 5.
+
+### Detailed Step-by-Step Breakdown:
+
+#### Initial State of `marks`:
+
+Before calling `marks.entry("Sita").and_modify(|mark| *mark += 5);`, assume the `marks` `HashMap` looks like this:
+
+```rust
+{
+    "Ram": 32,
+    "Shyam": 45,
+    "Geeta": 38,
+    "Sita": 50
+}
+```
+
+* `"Sita"`'s value is `50`.
+
+#### Step-by-Step Breakdown of `marks.entry("Sita").and_modify(|mark| *mark += 5)`:
+
+1. **`marks.entry("Sita")`**:
+
+   * The method checks if `"Sita"` exists in the `HashMap`.
+   * In this case, `"Sita"` is present with the value `50`.
+   * It returns an `OccupiedEntry` for `"Sita"`.
+
+2. **`and_modify(|mark| *mark += 5)`**:
+
+   * The closure `|mark| *mark += 5` will now be applied to the value associated with `"Sita"`.
+   * The `mark` reference is a **mutable reference** to the value `50` stored for `"Sita"`.
+   * Inside the closure:
+
+     * `*mark` dereferences the reference, giving us access to the value `50`.
+     * `*mark += 5` increments the value from `50` to `55`.
+
+   After this operation, `"Sita"`'s value is updated to `55`.
+
+#### Final State of `marks`:
+
+After the operation, the `marks` `HashMap` is updated:
+
+```rust
+{
+    "Ram": 32,
+    "Shyam": 45,
+    "Geeta": 38,
+    "Sita": 55
+}
+```
+
+### Summary of Functions:
+
+1. **`entry("Sita")`**:
+
+   * This method returns an `Entry` object for the key `"Sita"`.
+   * It checks if `"Sita"` is in the `HashMap`. If present, it gives you an `OccupiedEntry` (which means the key exists), allowing you to modify or replace the value.
+
+2. **`and_modify(|mark| *mark += 5)`**:
+
+   * This method **modifies** the value associated with the key `"Sita"`. It only works if the key is already in the `HashMap`.
+   * The closure `|mark| *mark += 5` is applied to the value, which is a **mutable reference**. The dereference `*mark` accesses the value, and `mark += 5` increases it by 5.
+
+### Why use `and_modify()`?
+
+* `and_modify()` allows us to modify a value **in place** without needing to manually check if the key exists and then update it.
+* It ensures safety and clarity, as it only modifies values for **existing keys** and does not panic if the key is missing.
+* This method is often more efficient when you want to modify the value of a key directly without inserting a new value if it doesn't exist.
+
+---
+
+Let me know if you'd like further clarification on any of the steps or concepts!
