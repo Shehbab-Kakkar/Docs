@@ -138,13 +138,3 @@ Ram's marks: 32
 This program demonstrates how to efficiently manipulate a `HashMap` in Rust using methods like `get()`, `entry()`, `or_insert()`, and `and_modify()`. These methods provide robust handling of key-value pairs, whether you’re accessing, modifying, or inserting data.
 
 ---
-
-````
-
-### Explanation of Markdown:
-- **Headings (`#`)**: Provides structure and section titles.
-- **Code Blocks (` ```rust `)**: Used for both Rust code and outputs.
-- **Text Formatting (`**bold**`)**: Emphasizes key terms.
-  
-You can copy and paste this into your `README.md` on GitHub to showcase your code and its explanation effectively. Let me know if you need further adjustments!
-````
