@@ -28,3 +28,11 @@ func main() {
 	fmt.Println("Addition:", result1)       // Output: Addition: 7
 	fmt.Println("Multiplication:", result2) // Output: Multiplication: 30
 }
+/*
+Input for the program ( Optional )
+STDIN
+Output:
+
+Addition: 7
+Multiplication: 30
+*/
