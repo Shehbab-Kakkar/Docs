@@ -361,3 +361,169 @@ fmt.Println(caculateArea(tri))  // Output: 6
 ---
 
 Let me know if you want to see how you can use **type assertions** or **type switches** with interfaces too — it's useful when working with mixed types at runtime.
+----
+
+###Diagram###
+Sure! Let's break down the **Go program involving interfaces, structs, and polymorphism** into a **clear conceptual diagram** and explain each part step by step.
+
+---
+
+## 🧩 Program Structure Overview
+
+```
+          +-----------------------+
+          |      Interface        |
+          |-----------------------|
+          |      Shape            |
+          |-----------------------|
+          | + Area() float64      |
+          +-----------------------+
+                    ▲
+                    ▲
+      ------------------------------
+      |                            |
++-------------+           +----------------+
+|  Rectangle  |           |    Circle      |
+|-------------|           |----------------|
+| width       |           | radious        |
+| height      |           +----------------+
+|-------------|           | + Area()       |
+| + Area()    |           +----------------+
++-------------+                   |
+                                  |
+                                  ▼
+                        +------------------------+
+                        | caculateArea(s Shape)  |
+                        |  - Calls s.Area()      |
+                        +------------------------+
+                                  |
+                                  ▼
+                     +------------------------------+
+                     |         main()               |
+                     |------------------------------|
+                     | rect := Rectangle{...}       |
+                     | circle := Circle{...}        |
+                     |                              |
+                     | print(caculateArea(rect))    |
+                     | print(caculateArea(circle))  |
+                     +------------------------------+
+```
+
+---
+
+## 🔍 Step-by-Step Explanation with Diagram Reference
+
+---
+
+### 🔷 1. **Interface Definition**
+
+```go
+type Shape interface {
+    Area() float64
+}
+```
+
+* This defines a **Shape interface**.
+* Any type with a method `Area() float64` satisfies this interface.
+
+📌 In the diagram: This is the top box `Shape` that other types point to.
+
+---
+
+### 🔶 2. **Structs (Concrete Types)**
+
+```go
+type Rectangle struct {
+    width, height float64
+}
+
+type Circle struct {
+    radious float64
+}
+```
+
+* Two structs: `Rectangle` and `Circle`
+* These are the **concrete types** that hold data (dimensions).
+
+---
+
+### 🔧 3. **Implementing the Interface**
+
+Each struct implements the `Area()` method.
+
+```go
+func (r Rectangle) Area() float64 {
+    return r.width * r.height
+}
+
+func (c Circle) Area() float64 {
+    return math.Pi * c.radious * c.radious
+}
+```
+
+✅ Now both types satisfy the `Shape` interface!
+
+📌 In the diagram: Both `Rectangle` and `Circle` point up to `Shape` interface to show they implement it.
+
+---
+
+### 🔄 4. **Function Accepting Interface**
+
+```go
+func caculateArea(s Shape) float64 {
+    return s.Area()
+}
+```
+
+* This function accepts **any type** that implements `Shape`.
+* It uses **polymorphism**: calling `s.Area()` works regardless of the concrete type (`Rectangle`, `Circle`, etc.)
+
+📌 In the diagram: The arrow from `Rectangle` and `Circle` to `caculateArea()` shows that instances of these structs can be passed to it as `Shape`.
+
+---
+
+### ▶️ 5. **main() Function Execution**
+
+```go
+func main() {
+    rect := Rectangle{width: 2, height: 2}
+    circle := Circle{radious: 2}
+
+    fmt.Println("Rectangle Area:", caculateArea(rect))
+    fmt.Println("Circle Area:", caculateArea(circle))
+}
+```
+
+* `rect` and `circle` are **concrete values**.
+* Passed into `caculateArea`, which treats them as **interface type** `Shape`.
+
+📌 In the diagram: main() calls `caculateArea` with both types — the behavior is dynamically chosen based on which struct was passed.
+
+---
+
+## 📈 Polymorphism in Action
+
+This is a classic example of **polymorphism** in Go using interfaces:
+
+* `caculateArea()` doesn't know (or care) whether it's handling a `Rectangle` or `Circle`.
+* It just knows it's getting something that satisfies `Shape`.
+
+The actual method call is resolved **dynamically at runtime**.
+
+---
+
+## 🧠 Summary Table
+
+| Concept             | Meaning                                                   |
+| ------------------- | --------------------------------------------------------- |
+| Interface           | Defines behavior (`Shape` with `Area()`)                  |
+| Struct              | Concrete data types (`Rectangle`, `Circle`)               |
+| Method              | Function tied to a struct (`Area()` on each struct)       |
+| Polymorphism        | One interface, many implementations                       |
+| Compile-time Safety | Go checks if struct implements interface before compiling |
+
+---
+
+Would you like this diagram as an image (flowchart style) as well? I can generate one.
+
+
