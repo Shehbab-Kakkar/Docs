@@ -1,3 +1,4 @@
+```go
 package main
 
 import "fmt"
@@ -20,7 +21,7 @@ func main() {
 	newPayment := payment{}
 	newPayment.makePayment(100)
 }
-
+```
 
 Explain the program and it's flow
 
