@@ -526,4 +526,142 @@ The actual method call is resolved **dynamically at runtime**.
 
 Would you like this diagram as an image (flowchart style) as well? I can generate one.
 
+---
+Excellent — you're asking a key question:
+
+> ❓ How exactly does the value `rect` (which is of type `Rectangle`) get passed to the parameter `s Shape` in the function `caculateArea(s Shape)`?
+
+---
+
+## ✅ **Short Answer:**
+
+Go **automatically converts** `rect` to the interface type `Shape` **because `Rectangle` implements the `Area()` method** required by the `Shape` interface.
+
+This is done **at compile time**, safely and implicitly.
+
+---
+
+## 🔁 **Step-by-Step Explanation**
+
+Let's start with the function definition:
+
+```go
+func caculateArea(s Shape) float64 {
+    return s.Area()
+}
+```
+
+Here:
+
+* `s` is of **interface type** `Shape`
+* `caculateArea` can accept **any value that implements `Area() float64`**
+
+---
+
+### 🧱 You define:
+
+```go
+type Rectangle struct {
+    width, height float64
+}
+
+func (r Rectangle) Area() float64 {
+    return r.width * r.height
+}
+```
+
+Now `Rectangle` **implements** the `Shape` interface — because it has the `Area()` method.
+
+---
+
+### 🧪 Then in `main()`:
+
+```go
+rect := Rectangle{width: 2, height: 2}
+fmt.Println("Rectangle Area:", caculateArea(rect))
+```
+
+Now the key part: `caculateArea(rect)` is called.
+
+Here’s what happens **behind the scenes**:
+
+---
+
+### ⚙️ Step-by-Step Internally
+
+#### Step 1:
+
+Compiler sees that `caculateArea` needs a `Shape`:
+
+```go
+func caculateArea(s Shape)
+```
+
+#### Step 2:
+
+You're passing `rect` — a `Rectangle`.
+
+Compiler checks:
+
+* Does `Rectangle` have a method `Area() float64`?
+  ✅ Yes
+
+So `Rectangle` **satisfies the interface** `Shape`.
+
+#### Step 3:
+
+Go **automatically wraps** `rect` into a `Shape` interface value.
+
+Internally, this interface value stores:
+
+* **Type info**: that the real type is `Rectangle`
+* **Value**: the actual `Rectangle{2, 2}` value
+
+#### Step 4:
+
+Inside `caculateArea`, calling `s.Area()` is dispatched to `Rectangle.Area()`, thanks to the type info stored in the interface.
+
+---
+
+## 📦 Interface Value = (Concrete Type + Value)
+
+When you pass `rect` into `caculateArea(s Shape)`, Go creates this interface value:
+
+```
+Shape {
+    concrete type: Rectangle
+    value: Rectangle{2, 2}
+}
+```
+
+This is **how Go achieves polymorphism** — by wrapping the concrete value into an interface type that carries both type and value.
+
+---
+
+## 💡 Visual Example
+
+```go
+// Main:
+rect := Rectangle{2, 2}
+caculateArea(rect)
+
+// Behind the scenes:
+s := Shape(rect) // implicit conversion
+s.Area()         // calls Rectangle.Area()
+```
+
+---
+
+## 🧠 Summary
+
+| Concept               | Explanation                                         |
+| --------------------- | --------------------------------------------------- |
+| `rect` is `Rectangle` | Has `Area() float64` method                         |
+| `Shape` interface     | Requires `Area() float64`                           |
+| Passing to function   | Go implicitly converts `rect` to `Shape`            |
+| Inside function       | Go uses dynamic dispatch to call the right `Area()` |
+
+---
+
+Would you like to see how to implement this same behavior manually using **type assertions** or **type switches** to access the original type inside the interface?
 
