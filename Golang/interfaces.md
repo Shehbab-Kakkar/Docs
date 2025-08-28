@@ -1,3 +1,40 @@
+```go
+package main
+import "fmt"
+import "math"
+type Shape interface{
+	Area() float64 //function and return type
+}
+type Rectangle struct {
+	width, height float64
+}
+type Circle struct {
+	radious float64
+}
+
+func (r Rectangle) Area() float64 {
+	return r.width * r.height
+}
+
+func (c Circle) Area() float64{
+	return math.Pi * c.radious * c.radious
+}
+
+func caculateArea(s Shape) float64 {
+	return s.Area()
+}
+func main(){
+   rect := Rectangle{width: 2, height: 2}
+   circle := Circle{radious:2 }
+   fmt.Println("Rectangle Area:", caculateArea(rect))
+   fmt.Println("Circle Area:", caculateArea(circle))
+}
+
+
+Explain this whole program data flow, enterface
+```
+
+
 This Go program demonstrates the use of **interfaces**, **structs**, and **polymorphism** through the calculation of areas for different geometric shapes.
 
 ---
