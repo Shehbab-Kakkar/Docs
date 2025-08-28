@@ -1,3 +1,29 @@
+package main
+
+import "fmt"
+
+type payment struct {
+}
+
+func (p payment) makePayment(amount float32) {
+	razerpayPaymentGw := razorpay{}
+	razerpayPaymentGw.pay(amount)
+}
+
+type razorpay struct{}
+
+func (r razorpay) pay(amount float32) {
+	fmt.Println("making payment using razerpay", amount)
+}
+
+func main() {
+	newPayment := payment{}
+	newPayment.makePayment(100)
+}
+
+
+Explain the program and it's flow
+
 This Go program demonstrates a **basic example of abstraction and delegation**, where a `payment` type delegates the responsibility of making a payment to a specific payment gateway implementation, in this case, `razorpay`.
 
 ---
