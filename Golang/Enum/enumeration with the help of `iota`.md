@@ -321,3 +321,46 @@ Sure! Below is a **graphical representation** of the **data flow** in your updat
 
 Would you like a **visual diagram (image)** version of this flowchart too?
 
+
+
+```go
+package main
+
+import "fmt"
+
+// enumeration types
+// custom types
+type OrderStatus int
+
+func (s OrderStatus) String() string {
+	switch s {
+	case Received:
+		return "Received"
+	case confirmed:
+		return "Confirmed"
+	case Prepared:
+		return "Prepared"
+	case Delivered:
+		return "Delivered"
+	default:
+		return "Unknown"
+	}
+}
+
+const (
+	Received OrderStatus = iota
+	confirmed
+	Prepared
+	Delivered
+)
+
+func changeOrderStatus(status OrderStatus) {
+	fmt.Println("changing order status to", status)
+}
+
+func main() {
+	changeOrderStatus(Prepared)
+
+}
+
+```
