@@ -139,6 +139,116 @@ changing order status to Received
 Would you like to see how to use this in a real-world order tracking system?
 
 ---
+
+Great question!
+
+The method:
+
+```go
+func (s OrderStatus) String() string {
+	// ...
+}
+```
+
+is **automatically called by Go** when you use an `OrderStatus` value with functions that expect a `string`, most commonly with **`fmt.Println()`** and other formatting functions from the `fmt` package.
+
+---
+
+### 🧠 **When and How Is It Called?**
+
+In your program, it's called **implicitly** here:
+
+```go
+fmt.Println("Changing order status to:", status)
+```
+
+Let’s break this down:
+
+* `status` is of type `OrderStatus` (which is just an alias for `int`, but with your custom type).
+* `fmt.Println` uses Go's formatting rules to print values.
+* **If a type has a `String()` method**, `fmt` automatically calls that method to get the string representation.
+
+---
+
+### ✅ Behind the Scenes:
+
+So, this:
+
+```go
+fmt.Println("Changing order status to:", status)
+```
+
+Is internally treated like:
+
+```go
+fmt.Println("Changing order status to:", status.String())
+```
+
+But you **don’t call it explicitly** — Go does it for you via the `fmt` package (or any other function using the `Stringer` interface).
+
+---
+
+### 📘 How It Works: `fmt.Stringer` Interface
+
+Your method implements the `Stringer` interface:
+
+```go
+type Stringer interface {
+	String() string
+}
+```
+
+Any type (like `OrderStatus`) that has a `String()` method is considered a `Stringer`. And `fmt` checks for this interface when printing.
+
+---
+
+### 🔄 Example Without `String()`:
+
+If you didn’t define the `String()` method, this:
+
+```go
+fmt.Println("Changing order status to:", status)
+```
+
+Would output:
+
+```
+Changing order status to: 0
+```
+
+Because `status` is just an `int` under the hood.
+
+But with the `String()` method, it outputs:
+
+```
+Changing order status to: Received
+```
+
+---
+
+### 🧪 If You Want to See It Explicitly Called
+
+You can do:
+
+```go
+fmt.Println(status.String())
+```
+
+Or:
+
+```go
+s := Received
+fmt.Println(s.String())
+```
+
+But in your original program, **you don’t need to** — Go handles it for you during printing.
+
+---
+
+Let me know if you want to explore how to use this with JSON, user input, or state transitions!
+
+
+---
 Sure! Below is a **graphical representation** of the **data flow** in your updated Go program, including how the `String()` method is implicitly called by `fmt.Println()`.
 
 ---
