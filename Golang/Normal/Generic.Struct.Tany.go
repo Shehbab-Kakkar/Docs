@@ -18,3 +18,7 @@ func main() {
 	}
 	fmt.Println(i)
 }
+/* 
+{[Go Rust Python Typescript]}
+{[1 2 4]}
+*/
