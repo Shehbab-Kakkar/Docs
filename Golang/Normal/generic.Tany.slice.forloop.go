@@ -1,7 +1,7 @@
 package main
 
 import "fmt"
-//any is not good use interface
+//Using Type T as any or interface{}  it satisfy both int and string types
 func printSlice[T any](items []T) {
 	for _, item := range items {
 		fmt.Println(item)
