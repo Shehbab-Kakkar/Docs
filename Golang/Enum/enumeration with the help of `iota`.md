@@ -137,3 +137,77 @@ changing order status to Received
 * You can make it more user-friendly by adding a `String()` method to convert int values to readable strings.
 
 Would you like to see how to use this in a real-world order tracking system?
+
+---
+Sure! Below is a **graphical representation** of the **data flow** in your updated Go program, including how the `String()` method is implicitly called by `fmt.Println()`.
+
+---
+
+### 📊 **Data Flow Graph**
+
+```plaintext
++-------------+
+|   main()    |
++------+------+
+       |
+       v
++---------------------+
+| changeOrderStatus() |
++---------------------+
+       |
+       v
++-----------------------------+
+|   fmt.Println(..., status)  |
++-----------------------------+
+       |
+       v
++-----------------------------------------+
+| Is there a String() method for status?  |
++--------------------------+--------------+
+                           |
+                   Yes     v
+                           +-----------------------------+
+                           | status.String() is called   |
+                           +-----------------------------+
+                           |
+                           v
+                 +----------------------------+
+                 | String() method returns:   |
+                 | "Received", "Confirmed",   |
+                 | "Prepared", or "Delivered" |
+                 +----------------------------+
+                           |
+                           v
+           +----------------------------------+
+           | Print final output to terminal   |
+           | e.g., "Changing order status to: |
+           | Received"                        |
+           +----------------------------------+
+```
+
+---
+
+### 🧠 Explanation of the Flow
+
+1. `main()` calls `changeOrderStatus()` with a constant like `Received`.
+2. `changeOrderStatus()` calls `fmt.Println(...)` to print the status.
+3. Since `status` is of type `OrderStatus`, Go checks if a `String()` method exists.
+4. It finds and calls `status.String()` → which returns a readable string.
+5. The final string is passed to `fmt.Println()` for output.
+
+---
+
+### 📦 Summary of Components
+
+| Component             | Role                                              |
+| --------------------- | ------------------------------------------------- |
+| `main()`              | Starts execution and triggers status updates.     |
+| `changeOrderStatus()` | Receives the status and prints it.                |
+| `OrderStatus` enum    | Represents different order states.                |
+| `String()` method     | Converts numeric enum to readable string.         |
+| `fmt.Println()`       | Prints the string using `String()` automatically. |
+
+---
+
+Would you like a **visual diagram (image)** version of this flowchart too?
+
