@@ -1,3 +1,13 @@
 AmbientMesh
 z-tunnel
 waypoint Proxy
+
+----
+
+istioctl version
+istioctl install --set profile=ambient
+kubectl get ds -n istio-system
+istio-cni-node
+ztunnel
+
+kubectl label namespace default istio.io/dataplane-mode=ambient
