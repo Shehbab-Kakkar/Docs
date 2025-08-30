@@ -210,4 +210,57 @@ If you want, I can also help with:
 * Explaining buffered channels or other concurrency patterns.
 * Handling errors or timeout contexts.
 
-Just let me know!
+---
+Here’s a **visual diagram** to illustrate the flow of your program — showing goroutines, channels, WaitGroup, and the data flow:
+
+```
++-------------------------------------------------------------+
+|                           main goroutine                     |
+|                                                             |
+|  dataChan := make(chan int)  <-------------------------+    |
+|                                                         |    |
+|  go func() {                                            |    |
+|      wg := sync.WaitGroup{}                             |    |
+|                                                         |    |
+|      for i := 0; i < 5; i++ {                           |    |
+|          wg.Add(1)                                      |    |
+|          go func() {                                    |    |
+|              result := DoWork()     (sleep 1 sec)       |    |
+|              dataChan <- result  --------------------- |----+-----> [dataChan channel] -------> main goroutine reads
+|              wg.Done()                                  |    |
+|          }()                                            |    |
+|      }                                                 |    |
+|                                                         |    |
+|      wg.Wait()                                         |    |
+|      close(dataChan)                                   |    |
+|  }()                                                  |    |
+|                                                        |    |
+|  for n := range dataChan {                             |    |
+|      fmt.Println(n)                                   |    |
+|  }                                                    |    |
++--------------------------------------------------------+----+
+
+Legend:
+- Boxes: Goroutines (main + workers)
+- Arrows: Data flow via channel (sending and receiving)
+- WaitGroup: Synchronizes all workers before closing channel
+```
+
+---
+
+### Explanation of diagram:
+
+* **Main goroutine** creates `dataChan` and launches an anonymous goroutine.
+* The **anonymous goroutine** launches 5 **worker goroutines**.
+* Each worker:
+
+  * Calls `DoWork()`, sleeps for 1 second, generates a random number.
+  * Sends result into `dataChan` channel.
+  * Calls `wg.Done()` when finished.
+* The anonymous goroutine waits for all workers (`wg.Wait()`), then closes the channel.
+* The **main goroutine** receives from `dataChan` in a `for range` loop and prints results as they arrive.
+* When the channel closes, the loop exits, and the program ends.
+
+---
+
+
