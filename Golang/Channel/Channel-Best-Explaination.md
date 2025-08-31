@@ -273,3 +273,78 @@ You need to start `go processNum(numChan)` **before** sending data because:
 
 Let me know if you want to see this in action with a small demo or diagram!
 
+----
+
+Absolutely! Here's your original Go program with **detailed comments** explaining the **data flow**, **channels**, **goroutines**, and why the order matters:
+
+---
+
+```go
+package main
+
+import (
+	"fmt"
+	"math/rand"
+	"time"
+)
+
+// processNum is a function that receives integers from a channel and processes them.
+// It runs in a separate goroutine and blocks waiting for values from the channel.
+func processNum(numChan chan int) {
+	// Continuously receive values from the channel
+	for num := range numChan {
+		fmt.Println("processing number", num)
+		time.Sleep(time.Second) // Simulate processing delay (1 second per number)
+	}
+}
+
+func main() {
+	// Create an unbuffered channel of type int.
+	// Unbuffered means: sends block until there's a receiver ready.
+	numChan := make(chan int)
+
+	// Start the receiver goroutine BEFORE sending data into the channel.
+	// This ensures the channel has an active listener when we start sending values.
+	go processNum(numChan)
+
+	// Infinite loop that generates random numbers and sends them into the channel.
+	// Because the channel is unbuffered, each send will block until processNum receives it.
+	for {
+		num := rand.Intn(100)       // Generate a random number between 0-99
+		numChan <- num              // Send the number into the channel
+		                            // This will block until processNum reads the value
+	}
+}
+```
+
+---
+
+### 💡 Summary of Data Flow (Annotated):
+
+```plaintext
+main() function:
+  - Creates a channel (numChan)
+  - Starts a goroutine: processNum(numChan)
+     ⬇️
+processNum() starts running in background:
+  - Listens for values on numChan
+     ⬆️
+main() loop:
+  - Generates random number
+  - Sends into numChan ➡️ blocks until processNum receives
+     ⬅️
+processNum:
+  - Receives value, prints, sleeps 1 sec
+  - Ready for next value
+```
+
+---
+
+### ✅ Why This Order Works
+
+* `go processNum(numChan)` starts a **receiver goroutine**, making sure someone is ready to read from `numChan`.
+* Then `main()` starts sending values.
+* Since the channel is **unbuffered**, this prevents a **deadlock** — every send is matched by a receive.
+
+Let me know if you’d like a version that uses a **buffered channel** or stops after a certain number of values.
+
