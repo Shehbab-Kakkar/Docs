@@ -140,4 +140,61 @@ main goroutine:
 
 ---
 
-Let me know if you'd like a diagram image or want to expand this with multiple goroutines or error handling!
+Great question! Let's break down exactly what this line does:
+
+---
+
+### 🔹 `<-done` — What is it doing?
+
+This line:
+
+```go
+<-done
+```
+
+is **receiving a value from the `done` channel**.
+
+---
+
+### 🔄 In Detail:
+
+* The `<-` operator is used to **receive** a value **from** a channel.
+* `done` is a **channel of type `chan bool`**, meaning it carries boolean values.
+* So `<-done` means:
+
+  > "**Wait here until a boolean value is sent into the `done` channel, then receive it.**"
+
+---
+
+### ⏸️ Why is it important?
+
+* This line **blocks** the `main()` function.
+* It pauses execution at that point until something **sends a value into `done`**.
+* In your case, the goroutine running `task(done)` will send `true` into `done` using:
+
+  ```go
+  defer func() { done <- true }()
+  ```
+
+---
+
+### 📌 In Simple Terms:
+
+| Line     | Meaning                                                   |
+| -------- | --------------------------------------------------------- |
+| `<-done` | "Wait here until the `task` function tells me it's done." |
+
+It ensures that `main()` does **not exit** until the goroutine finishes its work.
+
+---
+
+### ✅ After `true` is received:
+
+* Once the value is sent by the goroutine, `main()` receives it.
+* The blocking stops.
+* Since there's no code after `<-done`, the program then ends.
+
+---
+
+
+
