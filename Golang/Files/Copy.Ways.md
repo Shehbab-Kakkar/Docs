@@ -1,5 +1,5 @@
 ```go
-//Read and Write in the straming fashion
+//Read and Write in the streaming fashion
 
 package main
 
