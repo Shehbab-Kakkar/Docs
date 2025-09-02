@@ -67,4 +67,163 @@ Let me know if you want to:
 * Write binary data or JSON
 * Read the file afterward
 
-I can modify the example for those too.
+---
+Great! Since you answered "yes", I assume you're interested in one (or more) of the extended use cases I mentioned. Here are **several variations** of the program based on common needs — let me know which one you'd like to focus on:
+
+---
+
+## ✅ 1. **Append to a File (instead of overwriting)**
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func main() {
+	// Open file in append mode, create if not exists
+	file, err := os.OpenFile("example.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+	defer file.Close()
+
+	// Append data
+	data := "Appending this line to the file.\n"
+	_, err = file.WriteString(data)
+	if err != nil {
+		fmt.Println("Error writing to file:", err)
+		return
+	}
+
+	fmt.Println("Data appended to file successfully.")
+}
+```
+
+---
+
+## ✅ 2. **Write to a Specific Path**
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func main() {
+	// Create a file in a subdirectory
+	path := "data/output.txt"
+
+	// Make sure the directory exists
+	err := os.MkdirAll("data", os.ModePerm)
+	if err != nil {
+		fmt.Println("Error creating directory:", err)
+		return
+	}
+
+	file, err := os.Create(path)
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer file.Close()
+
+	_, err = file.WriteString("This file is in a subdirectory.\n")
+	if err != nil {
+		fmt.Println("Error writing:", err)
+		return
+	}
+
+	fmt.Println("File written to", path)
+}
+```
+
+---
+
+## ✅ 3. **Write JSON to a File**
+
+```go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
+type Person struct {
+	Name string `json:"name"`
+	Age  int    `json:"age"`
+}
+
+func main() {
+	person := Person{Name: "Alice", Age: 30}
+
+	file, err := os.Create("person.json")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(person)
+	if err != nil {
+		fmt.Println("Error encoding JSON:", err)
+		return
+	}
+
+	fmt.Println("JSON written to file successfully.")
+}
+```
+
+---
+
+## ✅ 4. **Read Back the File After Writing**
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func main() {
+	filename := "example.txt"
+
+	// Create and write to file
+	err := os.WriteFile(filename, []byte("Reading this after writing.\n"), 0644)
+	if err != nil {
+		fmt.Println("Write error:", err)
+		return
+	}
+
+	// Read the file
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		fmt.Println("Read error:", err)
+		return
+	}
+
+	fmt.Println("File contents:\n", string(data))
+}
+```
+
+---
+
+Let me know:
+
+* Which one you want to use or combine
+* If you'd like error handling/logging improvements
+* Or if you're working on a specific project (e.g. config file, logs, etc.)
+
+I can tailor it to your needs.
+
+
+
