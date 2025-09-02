@@ -313,4 +313,107 @@ Line 3
 Let me know if you want a version with error handling using `errors.Is()` or a progress bar for large files.
 
 
+---
+Great — here's a version of the `io.Copy()` approach with **detailed and clean error handling** using `errors.Is()` and Go’s idiomatic practices.
+
+---
+
+## ✅ **Go Program: File Copy with Proper Error Handling**
+
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+	"io"
+	"os"
+)
+
+func main() {
+	// Open the source file
+	src, err := os.Open("testing/example3.txt")
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			fmt.Println("Source file does not exist.")
+		} else {
+			fmt.Printf("Error opening source file: %v\n", err)
+		}
+		return
+	}
+	defer src.Close()
+
+	// Create the destination file
+	dst, err := os.Create("testing/example2.txt")
+	if err != nil {
+		fmt.Printf("Error creating destination file: %v\n", err)
+		return
+	}
+	defer dst.Close()
+
+	// Copy contents from source to destination
+	bytesCopied, err := io.Copy(dst, src)
+	if err != nil {
+		fmt.Printf("Error copying file: %v\n", err)
+		return
+	}
+
+	fmt.Printf("Copied %d bytes successfully.\n", bytesCopied)
+}
+```
+
+---
+
+## 🧠 **Explanation of Error Handling**
+
+| Code                             | Meaning                                       |
+| -------------------------------- | --------------------------------------------- |
+| `errors.Is(err, os.ErrNotExist)` | Checks if the error is "file not found"       |
+| `fmt.Printf(...)`                | Used for formatted output of errors           |
+| `return`                         | Exits early on error                          |
+| `defer file.Close()`             | Ensures file handles are closed even on error |
+
+---
+
+## 🔄 Example Run Output
+
+### ✅ Success
+
+```
+Copied 75 bytes successfully.
+```
+
+### ❌ Source File Missing
+
+```
+Source file does not exist.
+```
+
+### ❌ Permission Issue or Disk Full
+
+```
+Error creating destination file: permission denied
+```
+
+---
+
+## 🧰 Optional: Check If Destination Already Exists (Prevent Overwriting)
+
+If you want to **prevent overwriting** the destination file:
+
+```go
+if _, err := os.Stat("testing/example2.txt"); err == nil {
+	fmt.Println("Destination file already exists. Aborting.")
+	return
+}
+```
+
+Put that check before the `os.Create()` call.
+
+---
+
+Let me know if you want:
+
+* A version that shows a **progress bar** for large files.
+* A **command-line version** that accepts file names as arguments.
 
