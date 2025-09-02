@@ -1,17 +1,5 @@
 Here’s how you should proceed to upload your Go project to GitHub under your username Shehbab-Kakkar:
-
-## 1. Update Your Import Paths
-
-Change your import paths in all Go files from:
-```go
-"github.com/myaccount/podcast/..."
-```
-to:
-```go
-"github.com/Shehbab-Kakkar/podcast/..."
-```
-
-## 2. Project Structure & Files
+## 1. Project Structure & Files
 
 Here is the complete file structure and content with the correct import paths:
 
@@ -70,7 +58,7 @@ type User struct {
 }
 ```
 
-## 3. Initialize Your Module
+## 2. Initialize Your Module
 
 In your project root, run:
 ```bash
@@ -78,7 +66,7 @@ go mod init github.com/Shehbab-Kakkar/podcast
 go mod tidy
 ```
 
-## 4. Test Locally
+## 3. Test Locally
 
 Run:
 ```bash
@@ -91,7 +79,7 @@ session loggenIn
 user@gmail.com John
 ```
 
-## 5. Push to GitHub
+## 4. Push to GitHub
 
 1. Initialize git if you haven't:
     ```bash
