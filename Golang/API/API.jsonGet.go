@@ -1,0 +1,52 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"os"
+)
+
+type Todo struct {
+	UserID    int    `json:"userId"`
+	Id        int    `json:"id"`
+	Title     string `json:"title"`
+	Completed bool   `json:"completed"`
+}
+
+func main() {
+	fmt.Println("Learning CRUD")
+	res, err := http.Get("https://jsonplaceholder.typicode.com/todos/1")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error Getting:", err)
+		return
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		fmt.Println("Error in getting Response", res.Status)
+		return
+	}
+	// 	data, err := io.ReadAll(res.Body)
+	// 	if err != nil {
+	// 		fmt.Fprintln(os.Stderr, "Error reading:", err)
+	// 		return
+	// 	}
+	// 	fmt.Println("Data:", string(data))
+	var todo Todo
+	err = json.NewDecoder(res.Body).Decode(&todo)
+	if err != nil {
+		fmt.Println("Error decoding :", err)
+		return
+	}
+	fmt.Println("Todo: ", todo)
+
+	fmt.Println("Title response", todo.Title)
+
+	fmt.Println("Completed response", todo.Completed)
+}
+/*
+Learning CRUD
+Todo:  {1 1 delectus aut autem false}
+Title response delectus aut autem
+Completed response false
+*/
