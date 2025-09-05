@@ -127,4 +127,67 @@ In your `main()` function, after running GET and POST, this will delete the reso
 
 ---
 
-If you’d like to see how to read and print the response body or handle other HTTP methods, just ask!
+Certainly! Here’s an explanation for these two Go lines:
+
+```go
+client := http.Client{}
+res, err := client.Do(req)
+```
+
+---
+
+## **Line-by-Line Explanation**
+
+### **1. `client := http.Client{}`**
+
+- **What it does:**  
+  Creates a new value of type `http.Client`.
+- **Purpose:**  
+  The `http.Client` type is used to make HTTP requests (GET, POST, DELETE, etc.) in Go.
+- **Default settings:**  
+  By writing `http.Client{}`, you make a client with default settings (timeouts, redirects, etc.).
+- **Usage:**  
+  You can reuse a client for multiple requests, but here it’s created and used for just one.
+
+---
+
+### **2. `res, err := client.Do(req)`**
+
+- **What it does:**  
+  Calls the `Do` method of `http.Client`, which sends an HTTP request and returns an HTTP response.
+- **Parameters:**
+  - `req`: The HTTP request object you previously created (e.g., with `http.NewRequest`).
+- **Returns:**
+  - `res`: The HTTP response from the server (`*http.Response`).
+  - `err`: Any error encountered while sending the request or receiving the response.
+- **Common usage:**  
+  You check `err` to see if the request succeeded, then use `res` to read the server’s response (status code, headers, body, etc.).
+
+---
+
+## **Summary Table**
+
+| Code                          | Purpose                                                      |
+|-------------------------------|--------------------------------------------------------------|
+| `client := http.Client{}`     | Create a new HTTP client (default settings)                  |
+| `res, err := client.Do(req)`  | Send the HTTP request `req`, get response `res` and error `err` |
+
+---
+
+## **Example in Context**
+
+```go
+req, _ := http.NewRequest("GET", "https://example.com", nil)
+client := http.Client{}
+res, err := client.Do(req)
+if err != nil {
+    // Handle error
+}
+defer res.Body.Close()
+// Use res to read response data
+```
+
+---
+
+**In short:**  
+You create an HTTP client and use it to send your prepared HTTP request, receiving the server’s response or an error.
