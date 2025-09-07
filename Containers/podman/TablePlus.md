@@ -55,3 +55,16 @@ done
 ---
 
 Let me know if you want a custom SQL function or script to view all tables in all databases in a single query output!
+
+--
+SELECT column_name, data_type, is_nullable, column_default
+FROM information_schema.columns
+WHERE table_name = 'accounts';
+
+SELECT column_name, data_type, is_nullable, column_default
+FROM information_schema.columns
+WHERE table_name = 'entries';
+
+SELECT column_name, data_type, is_nullable, column_default
+FROM information_schema.columns
+WHERE table_name = 'transfers';
