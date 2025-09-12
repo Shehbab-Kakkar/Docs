@@ -56,3 +56,65 @@ Citations:
 [18] Kubernetes Application Management: Stateful Services https://www.alibabacloud.com/blog/kubernetes-application-management-stateful-services_595087
 [19] Deploying MySQL on Kubernetes: A Comprehensive Guide https://www.plural.sh/blog/kubernetes-mysql-deployment-guide/
 [20] Kubernetes StatefulSet - Examples & Best Practices https://www.vcluster.com/blog/kubernetes-statefulset-examples-and-best-practices
+
+---
+
+Give me the sequence of commands to bring the cluster up.
+
+To bring up a MySQL 3-node StatefulSet cluster on Kubernetes after a failure or outage, follow this detailed command sequence. These steps assume that PersistentVolumeClaims (PVCs) are healthy and the StatefulSet and Service YAMLs are already deployed.
+
+## Sequence of Commands
+
+### 1. Check Pod and Storage Status
+```shell
+kubectl get pods -l app=mysql
+kubectl get pvc -l app=mysql
+```
+Review which pods are not running and ensure PVCs are still bound and healthy[1][2].
+
+### 2. Restart the StatefulSet or Individual Pods
+If the entire StatefulSet needs to be restarted:
+```shell
+kubectl rollout restart statefulset <statefulset-name>
+```
+If only one or more pods have failed (for example, the master):
+```shell
+kubectl delete pod <pod-name>
+```
+Kubernetes will automatically recreate the deleted pod using the same persistent volume[1][2].
+
+### 3. Monitor Pod Recovery
+```shell
+kubectl get pods -l app=mysql -w
+```
+Wait until all pods show `STATUS` as `Running` and `READY` is at full for each pod.
+
+### 4. Check MySQL Process Health and Cluster Topology
+Check database startup and replication from inside the master and replica pods:
+```shell
+kubectl logs <pod-name>
+kubectl exec -it mysql-0 -- mysql -u root -p -e "SHOW MASTER STATUS\G"
+kubectl exec -it mysql-1 -- mysql -u root -p -e "SHOW SLAVE STATUS\G"
+kubectl exec -it mysql-2 -- mysql -u root -p -e "SHOW SLAVE STATUS\G"
+```
+This confirms that the master is running and replicas are connected[1].
+
+### 5. (If Needed) Manually Promote Replica
+If the master (`mysql-0`) and its PVC cannot be recovered, promote a replica to be master:
+```shell
+kubectl exec -it mysql-1 -- mysql -u root -p
+# Inside MySQL shell:
+STOP SLAVE;
+RESET SLAVE ALL;
+SET GLOBAL read_only = OFF;
+```
+Update other replicas to replicate from the new master using the `CHANGE MASTER TO ...` command[1].
+
+***
+
+These commands cover most operational recovery scenarios for a StatefulSet-managed MySQL cluster in Kubernetes, assuming standard replication setups and healthy storage[1][2][3].
+
+Citations:
+[1] Run a Replicated Stateful Application https://kubernetes.io/docs/tasks/run-application/run-replicated-stateful-application/
+[2] How to gracefully restart the cluster without downtime? https://forums.percona.com/t/how-to-gracefully-restart-the-cluster-without-downtime/23142
+[3] Deploy a stateful MySQL cluster on GKE | Kubernetes Engine https://cloud.google.com/kubernetes-engine/docs/tutorials/stateful-workloads/mysql
