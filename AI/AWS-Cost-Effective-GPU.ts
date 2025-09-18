@@ -1,5 +1,4 @@
 Amazon EC2 G6f instances are the latest GPU-based offerings from AWS, designed to deliver flexible, cost-efficient GPU acceleration, especially for users who do not always need a full GPU for their workloads.
-
 Key Features
 GPU Partitioning: G6f instances allow you to provision as little as 1/8 of an NVIDIA L4 Tensor Core GPU (3GB GPU memory), right-sizing resources and decreasing costs for workloads that don't require the power of a full GPU. You can select from half, quarter, and one-eighth GPU instance sizes.
 Backed by Latest Hardware: Paired with third-generation AMD EPYC processors, G6f supports up to 16 vCPUs and 12GB GPU memory, delivering a strong balance between CPU and GPU resources for graphics-heavy and ML workloads.
