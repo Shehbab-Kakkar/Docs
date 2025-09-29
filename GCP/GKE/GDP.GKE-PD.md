@@ -119,4 +119,130 @@ Google PD supports:
 
 ---
 
-If you want to see how to **pre-create a PD** and attach it manually to a PVC, or use **Regional Persistent Disks** for HA setups, let me know.
+To **extend (resize) a Persistent Disk attached to a Pod in GKE**, you need to **resize the Persistent Volume Claim (PVC)** — Kubernetes and GKE will handle the disk resizing automatically behind the scenes.
+
+---
+
+## ✅ Requirements to Resize PVC (Persistent Volume Claim)
+
+Before starting, make sure:
+
+1. **Kubernetes version is ≥ 1.11** (GKE supports this).
+2. The PVC uses a **StorageClass** that allows volume expansion.
+3. The volume is not in use by multiple pods (for ReadWriteOnce volumes).
+
+---
+
+## 🪛 Steps to Resize a Persistent Disk in GKE
+
+### ✅ Step 1: Confirm PVC Supports Expansion
+
+Check the **StorageClass** used by the PVC:
+
+```bash
+kubectl get pvc my-pvc -o jsonpath='{.spec.storageClassName}'
+```
+
+Then, inspect the StorageClass:
+
+```bash
+kubectl get storageclass standard -o yaml
+```
+
+Look for:
+
+```yaml
+allowVolumeExpansion: true
+```
+
+If it's not enabled, you can't resize the PVC unless you update or create a new StorageClass.
+
+---
+
+### ✅ Step 2: Edit the PVC to Request More Storage
+
+Use `kubectl edit` to increase the requested size:
+
+```bash
+kubectl edit pvc my-pvc
+```
+
+Find and change the `storage` field:
+
+```yaml
+spec:
+  resources:
+    requests:
+      storage: 20Gi  # ← Increase this value
+```
+
+> 💡 You can also use a patch command:
+
+```bash
+kubectl patch pvc my-pvc -p '{"spec": {"resources": {"requests": {"storage": "20Gi"}}}}'
+```
+
+---
+
+### ✅ Step 3: Wait for Resize to Take Effect
+
+You can check the status:
+
+```bash
+kubectl get pvc my-pvc
+```
+
+Watch for the `STATUS` to become `Bound`, and check if the `CAPACITY` has updated.
+
+In some cases, you may need to restart the pod or deployment to complete the resize.
+
+---
+
+## ⚠️ Important Notes
+
+* **Online resizing**: Most apps can handle resizing without pod restarts, but some require remounting.
+* **Filesystem resize**: Kubernetes should automatically resize the filesystem if it supports it (e.g., ext4, xfs).
+* **ReadWriteOnce limitation**: Volume can only be mounted by a single node. If your pod is rescheduled, GKE will remount the resized disk.
+
+---
+
+## 🧪 Example: Full Resize Workflow
+
+1. Check current PVC size:
+
+   ```bash
+   kubectl get pvc my-pvc
+   ```
+
+2. Resize:
+
+   ```bash
+   kubectl patch pvc my-pvc -p '{"spec": {"resources": {"requests": {"storage": "30Gi"}}}}'
+   ```
+
+3. Verify:
+
+   ```bash
+   kubectl get pvc my-pvc
+   ```
+
+4. If necessary, restart the pod:
+
+   ```bash
+   kubectl rollout restart deployment my-deployment
+   ```
+
+---
+
+## ✅ Done!
+
+The underlying **Google Persistent Disk** is now resized and available to your pod, automatically handled by Kubernetes and GKE.
+
+---
+
+Let me know if:
+
+* You want to resize a **pre-existing static PD**.
+* You're using **Regional Persistent Disks**.
+* The PVC is **stuck in `Resizing`**.
+
