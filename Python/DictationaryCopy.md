@@ -1,4 +1,4 @@
-Great question! You're asking why, when you assign a dictionary to another variable and then `pop` an element from that new variable, it also removes the element from the **original dictionary**.
+Great question! You're asking why, when you assign a dictionary to another variable and then `pop` an element from that new variable, it also removes the element from the **original dictionary**
 
 Let's walk through it clearly.
 
