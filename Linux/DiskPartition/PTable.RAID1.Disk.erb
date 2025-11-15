@@ -1,0 +1,28 @@
+#Dynamic (do not remove this line)
+cat <<EOF > /tmp/diskpart.cfg
+bootloader --location=mbr --driveorder=sda,sdb
+zerombr
+clearpart --all --initlabel --linux
+
+part biosboot --size=1 --ondisk=sda --fstype=biosboot
+part biosboot --size=1 --ondisk=sdb --fstype=biosboot
+
+part /boot --size=500 --ondisk=sda --fstype=mdmember
+part /boot --size=500 --ondisk=sdb --fstype=mdmember
+
+part pv --grow --ondisk=sda --fstype=mdmember
+part pv --grow --ondisk=sdb --fstype=mdmember
+
+raid /boot --device=md0 --level=1 --fstype=ext4 sda2 sdb2
+raid pv.raid --device=md1 --level=1 --fstype=lvmpv sda3 sdb3
+
+volgroup vg_root pv.raid
+logvol / --percent=100 --fstype=xfs --name=lv_root --vgname=vg_root
+
+
+EOF
+
+# Add the following at the end of your template
+#for i in {0..9}; do
+#  echo "part /mnt/disk${i} --fstype=xfs --ondisk=nvme${i}n1 --size=1 --grow" >> /tmp/diskpart.cfg
+#done
