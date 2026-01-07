@@ -73,3 +73,96 @@ startupProbe:
 - **Readiness Probe:** Controls traffic flow to pod.  
 - **Liveness Probe:** Triggers restarts if unhealthy.  
 - **Startup Probe:** Gives slow apps extra time before other probes start.
+
+
+Certainly! Here’s a breakdown of the common probe parameters in Kubernetes (applies to **readinessProbe, livenessProbe, and startupProbe**):
+
+---
+
+## 1. **Common Probe Parameters**
+
+| Parameter             | Description                                                                                  |
+|-----------------------|----------------------------------------------------------------------------------------------|
+| **initialDelaySeconds** | Seconds to wait after container starts before first probe is initiated (default: 0)         |
+| **periodSeconds**       | How often (in seconds) to perform the probe (default: 10)                                   |
+| **timeoutSeconds**      | Number of seconds after which the probe times out (default: 1)                              |
+| **successThreshold**    | Minimum consecutive successes for probe to be considered successful (default: 1)            |
+| **failureThreshold**    | When a probe fails, number of retries before container is restarted or pod is marked unready (default: 3) |
+
+---
+
+## 2. **Probe Types**
+
+You can only choose _one_ type per probe. The main types are:
+
+### HTTP GET probe
+```yaml
+httpGet:
+  path: /healthz
+  port: 8080
+  httpHeaders:
+  - name: Custom-Header
+    value: Awesome
+  scheme: HTTP
+```
+- **path**: Endpoint path to check (e.g., `/healthz`)
+- **port**: Container port to call
+- **httpHeaders**: Custom HTTP headers
+- **scheme**: `HTTP` or `HTTPS`
+
+---
+
+### TCP Socket probe
+```yaml
+tcpSocket:
+  port: 8080
+```
+- **port**: Port to check for an open TCP connection
+
+---
+
+### Exec probe
+```yaml
+exec:
+  command:
+    - cat
+    - /tmp/healthy
+```
+- **command**: Command to run inside the container; success if exit code = 0
+
+---
+
+## 3. **All Parameters—Explanation Table**
+
+| Parameter              | Applies to       | Description                                                           |
+|------------------------|------------------|-----------------------------------------------------------------------|
+| initialDelaySeconds    | All probes       | Wait time in seconds before performing first check after container start |
+| periodSeconds          | All probes       | Time between each probe attempt (seconds)                             |
+| timeoutSeconds         | All probes       | How long to wait for a response before it’s considered a failure      |
+| successThreshold       | All probes       | How many successes needed to mark container healthy/ready             |
+| failureThreshold       | All probes       | Failures allowed before considered failed/unready (or restarted)      |
+| httpGet                | HTTP/TCP probes  | Parameters for HTTP GET requests (path, port, headers, scheme)        |
+| tcpSocket              | TCP probes       | Parameters for checking TCP (port)                                    |
+| exec                   | Exec probes      | Command to execute for health check                                   |
+
+---
+
+## **Example Probe Spec**
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 2
+  successThreshold: 1
+  failureThreshold: 3
+```
+
+---
+
+### **In summary:**
+- Use these parameters to **tune how and when Kubernetes checks container health** and what happens when it fails.
+- The flexibility lets you accommodate fast, slow, or unreliable startup and health patterns!
