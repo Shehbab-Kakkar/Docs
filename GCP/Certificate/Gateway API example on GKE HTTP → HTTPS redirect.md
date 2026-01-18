@@ -190,7 +190,7 @@ If you want, I can:
 
 Just tell me 👍
 
-
+mermaid
 graph TD
     %% External Traffic
     Client([External Client]) -- "1. http://example.com" --> GCLB_80[Cloud Load Balancer Port 80]
