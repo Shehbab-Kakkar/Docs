@@ -242,14 +242,111 @@ Use native GCS SDK instead in those cases.
 
 ---
 
-## 🔄 Want a Job or StatefulSet version?
+Here’s a **clear architecture diagram (text/ASCII)** showing how **GKE Pods in `test-dev`** securely access the **`testOK-dev` GCS bucket** using **Workload Identity + gcsfuse**.
 
-I can give you:
+---
 
-* `Job` (one-time processing)
-* `Deployment`
-* Autopilot-compatible YAML
-* Terraform setup
-* Performance-optimized flags
+## 🧭 High-Level Architecture Diagram
 
-Just tell me.
+```
+┌───────────────────────────────────────────────┐
+│                 GKE CLUSTER                   │
+│                test-dev (GKE)                 │
+│                                               │
+│  ┌─────────────────────────────────────────┐  │
+│  │               Namespace                 │  │
+│  │               test-dev                  │  │
+│  │                                         │  │
+│  │  ┌───────────────────────────────────┐  │  │
+│  │  │               Pod                 │  │  │
+│  │  │  name: gcsfuse-testok              │  │  │
+│  │  │                                   │  │  │
+│  │  │  /data  ───────────────┐          │  │  │
+│  │  │        (gcsfuse mount)  │          │  │  │
+│  │  │                         │          │  │  │
+│  │  └─────────────────────────┘          │  │  │
+│  │            ▲                           │  │  │
+│  │            │                           │  │  │
+│  │  ┌───────────────────────────────────┐  │  │
+│  │  │ Kubernetes Service Account (KSA)  │  │  │
+│  │  │  testok-gcs-ksa                   │  │  │
+│  │  └───────────────────────────────────┘  │  │
+│  │            ▲                           │  │  │
+│  │            │ Workload Identity        │  │  │
+│  │            ▼                           │  │  │
+│  │  ┌───────────────────────────────────┐  │  │
+│  │  │ Google Service Account (GSA)       │  │  │
+│  │  │ testok-dev-gcs-sa                  │  │  │
+│  │  └───────────────────────────────────┘  │  │
+│  │            ▲                           │  │  │
+│  │            │ IAM (bucket-level)       │  │  │
+│  │            ▼                           │  │  │
+│  └─────────────────────────────────────────┘  │
+│                                               │
+└───────────────────────────────────────────────┘
+                │
+                │ Google Cloud Storage API
+                ▼
+┌───────────────────────────────────────────────┐
+│             GCS BUCKET                        │
+│             gs://testOK-dev                   │
+│                                               │
+│  roles/storage.objectViewer / objectAdmin     │
+│                                               │
+└───────────────────────────────────────────────┘
+```
+
+---
+
+## 🔁 Authentication & Access Flow (Step-by-Step)
+
+```
+Pod starts
+   ↓
+Uses KSA: testok-gcs-ksa
+   ↓
+Workload Identity exchange
+   ↓
+Acts as GSA: testok-dev-gcs-sa
+   ↓
+gcsfuse CSI driver
+   ↓
+GCS IAM checks (bucket-level)
+   ↓
+Bucket mounted at /data
+```
+
+---
+
+## 🔐 Security Boundaries (why this is safe)
+
+| Boundary                | Enforced by                |
+| ----------------------- | -------------------------- |
+| Only `test-dev` cluster | Workload Identity pool     |
+| Only selected Pods      | Kubernetes Service Account |
+| Only this bucket        | Bucket IAM                 |
+| No credentials          | Metadata server            |
+| No key leakage          | Zero JSON keys             |
+
+---
+
+## 🧩 Key Components Summary
+
+| Component                 | Purpose          |
+| ------------------------- | ---------------- |
+| KSA (`testok-gcs-ksa`)    | Pod identity     |
+| GSA (`testok-dev-gcs-sa`) | GCP IAM identity |
+| Workload Identity         | Secure mapping   |
+| gcsfuse CSI driver        | Filesystem mount |
+| GCS bucket                | Storage backend  |
+
+---
+
+If you want, I can also:
+
+* Convert this into a **Mermaid diagram** (for docs)
+* Provide a **draw.io / Lucidchart layout**
+* Show a **comparison diagram vs JSON keys**
+* Add **multi-cluster isolation diagram**
+
+Just tell me which format you want 👍
