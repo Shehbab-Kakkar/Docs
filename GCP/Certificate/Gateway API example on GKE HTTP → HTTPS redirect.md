@@ -190,4 +190,4 @@ If you want, I can:
 
 Just tell me 👍
 
-![Diagram](images/gatewayapi-redirect.png)
+![Diagram](gatewayapi-redirect.png)
