@@ -190,26 +190,4 @@ If you want, I can:
 
 Just tell me 👍
 
-mermaid
-graph TD
-    %% External Traffic
-    Client([External Client]) -- "1. http://example.com" --> GCLB_80[Cloud Load Balancer Port 80]
-    Client -- "3. https://example.com" --> GCLB_443[Cloud Load Balancer Port 443]
-
-    subgraph "Google Cloud Infrastructure"
-        GCLB_80 -- "2. Redirect (301)" --> Client
-        GCLB_443 -- "4. Decrypt (TLS)" --> GFE[Google Front End]
-    end
-
-    subgraph "GKE Cluster"
-        GFE -- "5. Rule Match" --> HTTPRoute[HTTPRoute Resource]
-        HTTPRoute -- "6. Load Balance" --> Service[K8s Service]
-        Service -- "7. Proxy" --> Pod[App Pod]
-    end
-
-    %% Legend
-    classDef k8s fill:#326ce5,color:#fff;
-    classDef gcp fill:#4285f4,color:#fff;
-    class HTTPRoute,Service,Pod k8s;
-    class GCLB_80,GCLB_443,GFE gcp;
-
+![Diagram](images/gatewayapi-redirect.png)
