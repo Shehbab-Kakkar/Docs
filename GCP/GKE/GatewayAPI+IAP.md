@@ -212,13 +212,3 @@ const user = req.headers['x-goog-authenticated-user-email'];
 
 ---
 
-## Want more?
-
-I can:
-
-* Show **Terraform** for this setup
-* Add **Cloud Armor + IAP**
-* Compare with **Anthos Service Mesh / mTLS**
-* Show **multi-route / multi-service** IAP setup
-
-Just tell me.
