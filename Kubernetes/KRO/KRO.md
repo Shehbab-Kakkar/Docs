@@ -123,4 +123,3 @@ Do you want this:
 3️⃣ Mapped to **platform engineering skills or architecture**
 4️⃣ Turned into **slides or an executive summary**
 
-Tell me the number 👍
