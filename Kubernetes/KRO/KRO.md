@@ -1,23 +1,31 @@
 
 ---
-Kube Resource Orchestrator (kro) is an open-source, Kubernetes-native project designed to simplify the creation and management of complex custom resources. Announced in November 2024 and officially moving to a joint community-driven model in early 2025, it is a collaborative effort between AWS, Google Cloud, and Microsoft. 
-Core Concept
-KRO addresses the "YAML nightmare" and the overhead of writing custom controllers. Instead of building bespoke operators for every complex application, platform teams use KRO to define ResourceGraphDefinitions (RGDs). These RGDs act as blueprints that group multiple Kubernetes objects (and cloud resources) into a single, reusable API. 
-Key Features
-ResourceGraphDefinition (RGD): The fundamental custom resource where users define the schema (configurable fields) and the underlying resources to be orchestrated.
-CEL Integration: Uses Common Expression Language (CEL) to define dependencies, pass values between objects, and set conditional logic without writing Go code.
-Automated Controller Lifecycle: When an RGD is applied, KRO automatically generates a new Custom Resource Definition (CRD) and deploys a dedicated "micro-controller" to manage instances of that resource.
-Intelligent Dependency Handling: KRO analyzes resource relationships to build a Directed Acyclic Graph (DAG), ensuring resources are created or deleted in the correct topological order. 
-Comparison with Existing Tools
-Feature 	KRO	Helm / Kustomize	Crossplane
-Mechanism	Server-side orchestration	Client-side templating	Control plane for cloud resources
-Complexity	Zero-code controllers	Manual YAML management	Requires provider-specific logic
-Resource Scope	Native K8s + Cloud resources	Primarily K8s resources	Primarily non-K8s resources
-Status and Availability (2026)
-As of early 2026, KRO is a subproject of the Kubernetes SIG Cloud Provider. 
-Maturity: It is currently in Alpha/Experimental development and is generally not recommended for critical production workloads yet.
-Managed Options: While originally an AWS Labs experiment, it is now integrated as a managed capability in services like Amazon EKS, which eliminates the need to manually scale the KRO controllers.
-Governance: The project follows Cloud Native Computing Foundation (CNCF) governance guidelines to ensure vendor neutrality.
+Kube Resource Orchestrator (kro) is an open-source, Kubernetes-native project designed to simplify the creation and management of complex custom resources. Announced in November 2024 and officially moving to a joint community-driven model in early 2025, it is a collaborative effort between AWS, Google Cloud, and Microsoft.
+
+**Core Concept**
+KRO addresses the "YAML nightmare" and the overhead of writing custom controllers. Instead of building bespoke operators for every complex application, platform teams use KRO to define ResourceGraphDefinitions (RGDs). These RGDs act as blueprints that group multiple Kubernetes objects (and cloud resources) into a single, reusable API.
+
+**Key Features**
+
+* **ResourceGraphDefinition (RGD):** The fundamental custom resource where users define the schema (configurable fields) and the underlying resources to be orchestrated.
+* **CEL Integration:** Uses Common Expression Language (CEL) to define dependencies, pass values between objects, and set conditional logic without writing Go code.
+* **Automated Controller Lifecycle:** When an RGD is applied, KRO automatically generates a new Custom Resource Definition (CRD) and deploys a dedicated "micro-controller" to manage instances of that resource.
+* **Intelligent Dependency Handling:** KRO analyzes resource relationships to build a Directed Acyclic Graph (DAG), ensuring resources are created or deleted in the correct topological order.
+
+**Comparison with Existing Tools**
+
+| Feature        | KRO                          | Helm / Kustomize        | Crossplane                        |
+| -------------- | ---------------------------- | ----------------------- | --------------------------------- |
+| Mechanism      | Server-side orchestration    | Client-side templating  | Control plane for cloud resources |
+| Complexity     | Zero-code controllers        | Manual YAML management  | Requires provider-specific logic  |
+| Resource Scope | Native K8s + Cloud resources | Primarily K8s resources | Primarily non-K8s resources       |
+
+**Status and Availability (2026)**
+As of early 2026, KRO is a subproject of the Kubernetes SIG Cloud Provider.
+
+* **Maturity:** It is currently in Alpha/Experimental development and is generally not recommended for critical production workloads yet.
+* **Managed Options:** While originally an AWS Labs experiment, it is now integrated as a managed capability in services like Amazon EKS, which eliminates the need to manually scale the KRO controllers.
+* **Governance:** The project follows Cloud Native Computing Foundation (CNCF) governance guidelines to ensure vendor neutrality.
 
 ## 1. How KRO Fits into Platform Engineering (Why it matters)
 
