@@ -178,3 +178,130 @@ Perfect! Let’s map it out clearly. Here’s a **diagram-style explanation** of
 
 ---
 
+
+Got it! Let’s go step by step. I’ll show you **how to identify high CPU and memory processes on RHEL 9**, give an example, and explain **why they’re consuming resources**.
+
+---
+
+## **1. Identify High CPU Processes**
+
+Use the `top` or `ps` commands.
+
+### **Option A: Using `top`**
+
+1. Run:
+
+```bash
+top
+```
+
+2. Press **Shift + P** → Sort by **CPU usage descending**.
+3. Look at `%CPU` column:
+
+   * The process at the top is using the most CPU.
+   * Example:
+
+```
+PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+2345 john      20   0  1500m  500m   50m R  95.3  6.4   12:30.25 python
+```
+
+* Here, a Python process (PID 2345) is consuming **95% CPU**.
+* `R` in **S column** → running.
+
+---
+
+### **Option B: Using `ps`**
+
+```bash
+ps -eo pid,user,comm,%cpu,%mem,etime --sort=-%cpu | head -n 10
+```
+
+* This lists **top 10 CPU-consuming processes**.
+* Example output:
+
+```
+PID  USER  COMMAND    %CPU  %MEM  ELAPSED
+2345 john  python     95.3  6.4   00:12:30
+1120 root  java       85.2  12.5  01:45:10
+```
+
+---
+
+## **2. Identify High Memory Processes**
+
+### **Option A: Using `top`**
+
+* Press **Shift + M** → Sort by **memory usage descending**.
+* `%MEM` column shows memory usage.
+* Example:
+
+```
+PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND
+1120 root     20   0  4000m 1000m  200m S  20.5 12.5   01:45.10 java
+```
+
+* RES = 1000 MB → actual RAM used.
+* VIRT = 4000 MB → virtual memory including heap, mapped files, swap.
+
+---
+
+### **Option B: Using `ps`**
+
+```bash
+ps -eo pid,user,comm,%cpu,%mem,etime --sort=-%mem | head -n 10
+```
+
+* Lists **top 10 memory consumers**.
+
+---
+
+## **3. Understanding Why a Process is High CPU or Memory**
+
+| Resource | Reason                                            | Kernel / User Role                                                            |
+| -------- | ------------------------------------------------- | ----------------------------------------------------------------------------- |
+| CPU      | Heavy computation, loops, multithreading          | Mostly user space; kernel CPU (`sy`) increases with syscalls, I/O, interrupts |
+| Memory   | Large datasets, many threads, cache, memory leaks | User space (heap/stack) + kernel structures (buffers, mmap)                   |
+
+**Example:**
+
+* A Python program processing a big dataset:
+
+  * `VIRT` = 1.5 GB (virtual memory)
+  * `RES` = 500 MB (resident memory)
+  * `%CPU` = 95% → fully using one core
+* Kernel space CPU usage remains low unless I/O or syscalls are heavy.
+
+---
+
+## **4. Tools to Drill Down**
+
+1. **`htop`** → Nice visual, shows tree view of processes, memory bars, CPU bars.
+2. **`pidstat`** → CPU/memory over time:
+
+```bash
+pidstat -u -r 1
+```
+
+3. **`smem`** → Detailed memory per process, includes shared memory:
+
+```bash
+smem -r | sort -k 4 -nr | head
+```
+
+---
+
+✅ **TL;DR Example of High Resource Process**
+
+| PID  | COMMAND | %CPU | %MEM | VIRT | RES   | Why                        |
+| ---- | ------- | ---- | ---- | ---- | ----- | -------------------------- |
+| 2345 | python  | 95   | 6.4  | 1.5G | 500M  | CPU-heavy computation      |
+| 1120 | java    | 20   | 12.5 | 4.0G | 1000M | Memory-heavy app, big heap |
+
+* `top` → shift P / M → sort by CPU / MEM.
+* `ps` → sort by `%cpu` / `%mem`.
+* Kernel mostly tracks system calls and I/O; user-space process consumes the bulk of CPU/memory.
+
+---
+
+
