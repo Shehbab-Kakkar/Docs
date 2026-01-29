@@ -1,0 +1,21 @@
+[root@rocky helm-charts]# helm status mytest --show-resources
+NAME: mytest
+LAST DEPLOYED: Thu Jan 29 15:15:49 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+RESOURCES:
+==> v1/Service
+NAME             TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+mytest-service   NodePort   10.96.245.176   <none>        80:30080/TCP   46s
+
+==> v1/Deployment
+NAME                READY   UP-TO-DATE   AVAILABLE   AGE
+mytest-deployment   1/1     1            1           46s
+
+==> v1/Pod(related)
+NAME                                 READY   STATUS    RESTARTS   AGE
+mytest-deployment-7bddf86ccf-b5qvj   1/1     Running   0          46s
+
+
+TEST SUITE: None
