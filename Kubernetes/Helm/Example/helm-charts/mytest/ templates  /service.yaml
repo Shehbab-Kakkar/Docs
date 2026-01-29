@@ -15,15 +15,4 @@ spec:
       nodePort: {{ .Values.service.nodePort }}
       {{- end }}
 
-[root@rocky mytest]# cat values.yaml 
-replicaCount: 1
 
-image:
-  repository: nginx
-  tag: stable
-  pullPolicy: IfNotPresent
-
-service:
-  type: NodePort
-  port: 80
-  nodePort: 30080
