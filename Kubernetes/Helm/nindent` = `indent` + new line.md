@@ -109,3 +109,124 @@ resources:
 > `indent` only adds spaces, while `nindent` adds a newline plus spaces, which is why `nindent` is preferred for rendering YAML blocks in Helm templates.
 
 If you want, I can show a **real Deployment snippet** where using `indent` breaks prod 😅
+
+Alright, here’s a **realistic Deployment example** showing how using **`indent` breaks YAML** and **`nindent` fixes it**. This is a *classic prod foot-gun* 😄
+
+---
+
+## ❌ Broken Deployment (using `indent`)
+
+### `values.yaml`
+
+```yaml
+resources:
+  limits:
+    cpu: "500m"
+    memory: "256Mi"
+```
+
+### `deployment.yaml` (WRONG)
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: nginx
+          resources:{{ toYaml .Values.resources | indent 12 }}
+```
+
+### Rendered output ❌
+
+```yaml
+resources:            limits:
+              cpu: 500m
+              memory: 256Mi
+```
+
+🔴 **What goes wrong**
+
+* `indent` does **not** add a new line
+* YAML becomes invalid
+* Kubernetes error like:
+
+```
+error converting YAML to JSON
+```
+
+---
+
+## ✅ Fixed Deployment (using `nindent`)
+
+### `deployment.yaml` (CORRECT)
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: nginx
+          resources:
+{{ toYaml .Values.resources | nindent 12 }}
+```
+
+### Rendered output ✅
+
+```yaml
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+```
+
+✔ Valid YAML
+✔ Kubernetes accepts it
+✔ No 3 a.m. pager alerts
+
+---
+
+## Why `nindent` works
+
+* Adds a **newline**
+* Then adds **12 spaces**
+* Perfect for nested Kubernetes structures
+
+---
+
+## Rule of thumb 🔥
+
+> If the line ends with `:` → you almost always need `nindent`
+
+---
+
+## Extra tip (very common pattern)
+
+```yaml
+{{- with .Values.resources }}
+resources:
+{{- toYaml . | nindent 12 }}
+{{- end }}
+```
+
+This:
+
+* avoids rendering empty blocks
+* keeps templates clean
+* is considered **Helm best practice**
+
+If you want next:
+
+* a **full production-grade Deployment**
+* common Helm interview traps
+* or debugging with `helm template`
+
