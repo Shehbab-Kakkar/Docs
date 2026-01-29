@@ -1,0 +1,55 @@
+[root@rocky helm-charts]# helm install mytest ./mytest
+NAME: mytest
+LAST DEPLOYED: Thu Jan 29 14:25:15 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+
+
+[root@rocky helm-charts]# kubectl get all
+NAME                                     READY   STATUS              RESTARTS   AGE
+pod/mytest-deployment-7bddf86ccf-5b7fr   0/1     ContainerCreating   0          6s
+
+NAME                     TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+service/kubernetes       ClusterIP   10.96.0.1       <none>        443/TCP        22h
+service/mytest-service   NodePort    10.96.216.102   <none>        80:30080/TCP   6s
+
+NAME                                READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/mytest-deployment   0/1     1            0           6s
+
+NAME                                           DESIRED   CURRENT   READY   AGE
+replicaset.apps/mytest-deployment-7bddf86ccf   1         1         0       6s
+
+[root@rocky helm-charts]# kubectl port-forward --address 192.168.64.11 svc/mytest-service 30080:80
+
+Forwarding from 192.168.64.11:30080 -> 80
+Handling connection for 30080
+
+ ~ % curl 192.168.64.11:30080
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+
+[root@rocky helm-charts]helm uninstall mytest
+release "mytest" uninstalled
