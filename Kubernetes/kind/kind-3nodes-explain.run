@@ -1,0 +1,103 @@
+1. Cluster kind and API version
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+
+
+kind: Cluster → This declares that you are creating a Kubernetes cluster.
+
+apiVersion → Specifies the version of Kind’s config schema (v1alpha4 is a stable one for current Kind versions).
+
+2. Nodes
+nodes:
+
+
+This defines the list of nodes in your cluster. You have 3 nodes total: 1 control-plane, 2 workers.
+
+3. Control-plane node
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30000
+        hostPort: 30000
+        protocol: TCP
+
+
+role: control-plane → This is your Kubernetes master node. It runs the API server, controller manager, scheduler, etc.
+
+extraPortMappings → Maps a port on the host to a port in the container.
+
+hostPort: 30000 → on your machine (host)
+
+containerPort: 30000 → inside the container (Kind node)
+
+This is useful for accessing services from outside the cluster.
+
+4. kubeadmConfigPatches for control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            "kube-reserved": "memory=500Mi"
+            "system-reserved": "memory=500Mi"
+
+
+kubeadmConfigPatches → Lets you patch the kubeadm configuration used to initialize the cluster.
+
+InitConfiguration → Only applies to the control-plane node during cluster creation.
+
+nodeRegistration.kubeletExtraArgs → Passes extra arguments to the kubelet (the Kubernetes node agent):
+
+"kube-reserved": "memory=500Mi" → Reserves 500Mi for Kubernetes system components (like kubelet, kube-proxy).
+
+"system-reserved": "memory=500Mi" → Reserves 500Mi for OS/system processes.
+
+Effect: Ensures your node doesn’t allocate all memory to workloads, keeping 500Mi for Kubernetes and 500Mi for the OS.
+
+5. Worker nodes
+  - role: worker
+    kubeadmConfigPatches:
+      - |
+        kind: JoinConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            "kube-reserved": "memory=800Mi"
+            "system-reserved": "memory=800Mi"
+
+
+role: worker → These nodes will only run workloads (pods) and not the control-plane components.
+
+JoinConfiguration → Only applies to nodes joining an existing cluster.
+
+kubeletExtraArgs → Reserves 800Mi for kube/system processes on each worker.
+
+You have 2 identical worker nodes, each reserving 800Mi memory for system processes.
+
+✅ Summary
+
+Cluster: 3 nodes (1 control-plane, 2 workers)
+
+Memory reservations:
+
+Control-plane: 500Mi for kube/system
+
+Workers: 800Mi for kube/system
+
+Port mapping:
+
+Control-plane: host port 30000 → container port 30000
+
+Uses kubeadm patches to configure the kubelet per node.
+
+
+
+
+
+----
+
+Your Host (localhost:30000)
+          ↓
+Kind Node (extraPortMappings: 30000 → ???)
+          ↓
+Kubernetes NodePort Service (port: 30000)
+          ↓
+Pod (containerPort: 80)
