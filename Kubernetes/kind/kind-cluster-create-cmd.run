@@ -1,0 +1,28 @@
+[root@rocky ~]# kind create cluster --name mycluster --config kind-3nodes-500mb.yaml 
+Creating cluster "mycluster" ...
+ ✓ Ensuring node image (kindest/node:v1.35.0) 🖼
+ ✓ Preparing nodes 📦 📦 📦  
+ ✓ Writing configuration 📜 
+ ✓ Starting control-plane 🕹️ 
+ ✓ Installing CNI 🔌 
+ ✓ Installing StorageClass 💾 
+ ✓ Joining worker nodes 🚜 
+Set kubectl context to "kind-mycluster"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-mycluster
+
+Thanks for using kind! 😊
+[root@rocky ~]# kubectl cluster-info --context kind-mycluster
+Kubernetes control plane is running at https://127.0.0.1:35763
+CoreDNS is running at https://127.0.0.1:35763/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+[root@rocky ~]# helm list
+NAME	NAMESPACE	REVISION	UPDATED	STATUS	CHART	APP VERSION
+[root@rocky ~]# kubectl get nodes -o wide
+NAME                      STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                         KERNEL-VERSION                  CONTAINER-RUNTIME
+mycluster-control-plane   Ready    control-plane   40s   v1.35.0   172.18.0.3    <none>        Debian GNU/Linux 12 (bookworm)   6.12.0-124.8.1.el10_1.aarch64   containerd://2.2.0
+mycluster-worker          Ready    <none>          26s   v1.35.0   172.18.0.4    <none>        Debian GNU/Linux 12 (bookworm)   6.12.0-124.8.1.el10_1.aarch64   containerd://2.2.0
+mycluster-worker2         Ready    <none>          26s   v1.35.0   172.18.0.2    <none>        Debian GNU/Linux 12 (bookworm)   6.12.0-124.8.1.el10_1.aarch64   containerd://2.2.0
+[root@rocky ~]# 
