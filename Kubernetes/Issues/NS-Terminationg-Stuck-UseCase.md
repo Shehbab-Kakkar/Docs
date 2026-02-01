@@ -1,4 +1,3 @@
-Perfect — now we can put **everything together** as a clear, step-by-step guide. Since you’ve successfully solved it using the commands above, I’ll explain **why the problem happened**, what each step did, and the expected output.
 
 ---
 
