@@ -221,7 +221,14 @@ kubectl delete ns <namespace>
 After following these steps, **all resources in `arc-runners` and `arc-systems` were deleted**, finalizers removed, and the namespaces **terminated successfully**, as confirmed by:
 
 ```
-kubectl get ns
+[root@rocky ~]# kubectl get ns
+NAME                 STATUS   AGE
+argocd               Active   28h
+default              Active   30h
+kube-node-lease      Active   30h
+kube-public          Active   30h
+kube-system          Active   30h
+local-path-storage   Active   30h
 ```
 
 ---
