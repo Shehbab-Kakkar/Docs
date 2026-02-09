@@ -1,0 +1,176 @@
+Perfect — **shell + curl** is a very common (and supported) way to automate **DigiCert ONE Portal** certificate renewal 👍
+Below is a **realistic, end-to-end Bash automation** you can drop into cron or a pipeline.
+
+I’ll assume:
+
+* DigiCert ONE **Portal REST API**
+* You already have an **API token**
+* **Auto-approval is enabled** in the certificate profile
+
+---
+
+# 🔁 DigiCert ONE – Full Automation via Shell Script
+
+## 🔐 Prerequisites (set once)
+
+```bash
+export DCONE_URL="https://<your-digicert-one-host>"
+export API_TOKEN="YOUR_API_TOKEN"
+export PROFILE_ID="PROFILE_UUID"
+```
+
+---
+
+## 1️⃣ Generate Private Key + CSR (OpenSSL)
+
+```bash
+CN="example.com"
+KEY_FILE="server.key"
+CSR_FILE="server.csr"
+
+openssl req -new -newkey rsa:2048 -nodes \
+  -keyout "$KEY_FILE" \
+  -out "$CSR_FILE" \
+  -subj "/CN=${CN}"
+```
+
+---
+
+## 2️⃣ Submit Certificate Request
+
+```bash
+CSR_CONTENT=$(awk '{printf "%s\\n", $0}' "$CSR_FILE")
+
+REQUEST_ID=$(curl -sk -X POST \
+  "$DCONE_URL/rest/v1/certificaterequests" \
+  -H "Authorization: Bearer $API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"profileId\": \"$PROFILE_ID\",
+    \"csr\": \"$CSR_CONTENT\",
+    \"validityPeriod\": {
+      \"unit\": \"DAYS\",
+      \"value\": 365
+    }
+  }" | jq -r '.id')
+
+echo "Certificate Request ID: $REQUEST_ID"
+```
+
+✅ Requires `jq` (`yum install jq` or `apt install jq`)
+
+---
+
+## 3️⃣ Poll Until Certificate Is Issued
+
+```bash
+echo "Waiting for certificate issuance..."
+
+while true; do
+  RESPONSE=$(curl -sk \
+    "$DCONE_URL/rest/v1/certificaterequests/$REQUEST_ID" \
+    -H "Authorization: Bearer $API_TOKEN")
+
+  STATUS=$(echo "$RESPONSE" | jq -r '.status')
+
+  echo "Status: $STATUS"
+
+  if [ "$STATUS" = "ISSUED" ]; then
+    CERT_ID=$(echo "$RESPONSE" | jq -r '.certificateId')
+    break
+  fi
+
+  if [ "$STATUS" = "REJECTED" ]; then
+    echo "❌ Certificate request rejected"
+    exit 1
+  fi
+
+  sleep 10
+done
+
+echo "Certificate ID: $CERT_ID"
+```
+
+---
+
+## 4️⃣ Download the Certificate (PEM + Chain)
+
+```bash
+curl -sk \
+  "$DCONE_URL/rest/v1/certificates/$CERT_ID/download?format=PEM&includeChain=true" \
+  -H "Authorization: Bearer $API_TOKEN" \
+  -o server.crt
+```
+
+Result:
+
+```
+server.key   (private key)
+server.crt   (certificate + chain)
+```
+
+---
+
+## 5️⃣ Install & Reload Service (Example: NGINX)
+
+```bash
+cp server.key /etc/nginx/ssl/server.key
+cp server.crt /etc/nginx/ssl/server.crt
+
+nginx -t && systemctl reload nginx
+```
+
+---
+
+## 6️⃣ Automatic Renewal (Cron Example)
+
+Renew **30 days before expiry**:
+
+```bash
+CERT_FILE="/etc/nginx/ssl/server.crt"
+DAYS_LEFT=$(openssl x509 -enddate -noout -in "$CERT_FILE" | \
+  cut -d= -f2 | \
+  xargs -I{} date -d "{}" +%s | \
+  awk '{print int(($1 - systime()) / 86400)}')
+
+if [ "$DAYS_LEFT" -le 30 ]; then
+  echo "Renewing certificate..."
+  /path/to/renew.sh
+fi
+```
+
+Cron entry:
+
+```bash
+0 2 * * * /path/to/check-and-renew.sh
+```
+
+---
+
+## ⚠️ Common DigiCert ONE Shell Pitfalls
+
+* ❌ Profile requires manual approval → script waits forever
+* ❌ CSR SANs missing → rejected
+* ❌ API token lacks **Certificate Download**
+* ❌ Using old key (best practice = new key per renewal)
+
+---
+
+## 🧠 Best Practices (Portal-Specific)
+
+* Use **one profile per automation**
+* Enable **auto-approval**
+* Pre-validate domains
+* Log request IDs for audit
+* Keep last cert as rollback
+
+---
+
+If you want, I can:
+
+* Add **SAN support** in the script
+* Convert this to a **single reusable function**
+* Create a **Kubernetes CronJob**
+* Add **Slack/email alerts on failure**
+
+Just tell me your environment (VM, container, LB, K8s).
